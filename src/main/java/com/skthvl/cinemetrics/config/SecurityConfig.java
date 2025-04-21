@@ -32,7 +32,7 @@ public class SecurityConfig {
                         "/api-docs/**",
                         "/h2-console/**")
                     .permitAll()
-                    .requestMatchers("/api/v1/hello")
+                    .requestMatchers("/api/v1/hello", "/api/v1/movies/**")
                     .permitAll()
                     .anyRequest()
                     .denyAll())

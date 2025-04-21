@@ -22,3 +22,9 @@ spring:
 #    driver-class-name: org.h2.Driver
 #    username: sa
 #    password:
+
+cinemetrics:
+  client:
+    omdbapi:
+      base-url: http://www.omdbapi.com
+      api-key: ENC(WtJFsHx3BTobZAu8V3PDT7ynWBseQcna)
