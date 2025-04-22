@@ -2,6 +2,7 @@ package com.skthvl.cinemetrics.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import com.skthvl.cinemetrics.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -10,18 +11,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @Slf4j
+@EnableWebSecurity
 public class SecurityConfig {
+
+  private final JwtAuthenticationFilter jwtFilter;
+
+  public SecurityConfig(final JwtAuthenticationFilter jwtFilter) {
+    this.jwtFilter = jwtFilter;
+  }
 
   @Bean
   public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
@@ -40,13 +50,21 @@ public class SecurityConfig {
                         "/configuration/ui",
                         "/configuration/security")
                     .permitAll()
-                    .requestMatchers("/api/v1/hello", "/api/v1/movies/**")
+                    .requestMatchers(
+                        "/api/v1/hello",
+                        "/api/v1/movies/{title}",
+                        "/api/v1/movies/{title}/oscar/",
+                        "/api/v1/login")
                     .permitAll()
+                    .requestMatchers(
+                        "/api/v1/logout", "/api/v1/users", "/api/v1/movies/{title}/ratings")
+                    .authenticated()
                     .anyRequest()
-                    .permitAll())
+                    .denyAll())
 
         // Stateless session (required for JWT)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
         // Exception handling
         .exceptionHandling(

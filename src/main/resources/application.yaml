@@ -34,3 +34,6 @@ cinemetrics:
   openapi:
     dev-url: http://localhost:8080
     prod-url: http://localhost:8080
+  jwt:
+    secret: ENC(G8EMZFYZuTNzuhCmHMAMDBFnwwQDW6VuLsGaWGFokmmqGcRpeBnZkbyBh7l2CFJR9PvDa+u5UpBowzfDVkLcbFWr8BZTRr6lIl8HcBdwRNw=)
+    expiration-in-seconds: 300
