@@ -8,10 +8,7 @@ import com.skthvl.cinemetrics.service.NominationInfoService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/movies")
@@ -40,9 +37,11 @@ public class MovieController {
     return ResponseEntity.ok(movieMapper.toMovieInfoResponse(movieDetails));
   }
 
-  @GetMapping("/{title}/oscar")
+  @GetMapping("/{title}/oscar/")
   public ResponseEntity<List<MovieAwardInfoResponse>> checkMovieWonBestPictureAward(
-      @PathVariable final String title) {
+      @PathVariable final String title,
+      @RequestParam(name = "category", required = false) final String category) {
+
     final var movieAwards =
         nominationInfoService.getMovieAwardInfo(title).stream()
             .map(movieMapper::toMovieAwardInfoResponse)

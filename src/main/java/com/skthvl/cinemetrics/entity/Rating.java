@@ -1,7 +1,6 @@
 package com.skthvl.cinemetrics.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,17 +12,22 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class User extends Auditable {
+public class Rating extends Auditable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false, updatable = false)
   private BigInteger id;
 
-  @Column(nullable = false)
-  @NotBlank
-  private String name;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "movie_id")
+  private Movie movie;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_account_id")
+  private UserAccount ratedBy;
 
   @Column(nullable = false)
-  @NotBlank
-  private String passwordHash;
+  private int rating;
+
+  private String comment;
 }
