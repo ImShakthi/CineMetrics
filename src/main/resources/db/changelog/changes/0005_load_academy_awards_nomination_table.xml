@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="0005_load_academy_awards_nomination_table" author="sakthivel balasubramaniam">
+        <customChange
+                class="com.skthvl.cinemetrics.service.AcademyAwardLoader">
+            <!--            <param name="filePath" value="data/movies.csv"/>-->
+        </customChange>
+    </changeSet>
+</databaseChangeLog>

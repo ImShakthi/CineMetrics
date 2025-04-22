@@ -2,16 +2,15 @@ package com.skthvl.cinemetrics.entity;
 
 import jakarta.persistence.*;
 import java.math.BigInteger;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@ToString
 public class Movie {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +19,9 @@ public class Movie {
 
   @Column(nullable = false)
   private String title;
+
+  @Column(nullable = false)
+  private int releaseYear;
 
   @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
   private BigInteger boxOfficeAmountUsd;

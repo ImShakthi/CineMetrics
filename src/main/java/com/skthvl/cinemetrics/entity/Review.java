@@ -18,11 +18,11 @@ public class Review extends Auditable {
   @Column(name = "id", nullable = false, updatable = false)
   private BigInteger id;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "movie_id")
   private Movie movie;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
 

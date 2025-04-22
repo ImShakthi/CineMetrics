@@ -12,7 +12,7 @@
             <column name="movie_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="year" type="int">
+            <column name="release_year" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="edition" type="int">
@@ -21,7 +21,7 @@
             <column name="category" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="nominee_name" type="varchar(255)">
+            <column name="nominee" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="has_won" type="boolean" defaultValueBoolean="false">
@@ -31,6 +31,13 @@
                 <constraints nullable="false"/>
             </column>
             <column name="award_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP"
+                    defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>

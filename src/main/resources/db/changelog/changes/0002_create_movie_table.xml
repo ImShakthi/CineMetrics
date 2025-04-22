@@ -10,11 +10,15 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
+            </column>
+            <column name="release_year" type="int">
+                <constraints nullable="false"/>
             </column>
             <column name="box_office_amount_usd" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addUniqueConstraint tableName="movie" columnNames="title,release_year" constraintName="uk_movie_title_year"/>
     </changeSet>
 </databaseChangeLog>
