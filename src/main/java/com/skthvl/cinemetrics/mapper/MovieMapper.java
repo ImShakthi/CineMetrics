@@ -1,6 +1,8 @@
 package com.skthvl.cinemetrics.mapper;
 
 import com.skthvl.cinemetrics.client.omdb.dto.MovieDetailsResponse;
+import com.skthvl.cinemetrics.model.dto.MovieAwardDto;
+import com.skthvl.cinemetrics.model.response.MovieAwardInfoResponse;
 import com.skthvl.cinemetrics.model.response.MovieInfoResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,4 +15,8 @@ public interface MovieMapper {
   @Mapping(target = "rated", source = "rated")
   @Mapping(target = "released", source = "released")
   MovieInfoResponse toMovieInfoResponse(final MovieDetailsResponse response);
+
+  @Mapping(target = "releaseYear", source = "releaseYear")
+  @Mapping(target = "hasWon", source = "hasWon")
+  MovieAwardInfoResponse toMovieAwardInfoResponse(final MovieAwardDto response);
 }

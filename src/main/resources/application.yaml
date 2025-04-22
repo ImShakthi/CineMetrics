@@ -31,3 +31,6 @@ cinemetrics:
     omdbapi:
       base-url: http://www.omdbapi.com
       api-key: ENC(WtJFsHx3BTobZAu8V3PDT7ynWBseQcna)
+  openapi:
+    dev-url: http://localhost:8080
+    prod-url: http://localhost:8080

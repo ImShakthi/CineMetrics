@@ -4,6 +4,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@Slf4j
 public class SecurityConfig {
 
   @Bean
@@ -30,12 +32,16 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/api-docs/**",
-                        "/h2-console/**")
+                        "/h2-console/**",
+                        "/webjars/**",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security")
                     .permitAll()
                     .requestMatchers("/api/v1/hello", "/api/v1/movies/**")
                     .permitAll()
                     .anyRequest()
-                    .denyAll())
+                    .permitAll())
 
         // Stateless session (required for JWT)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
