@@ -42,6 +42,21 @@ public class OmdbApiClient {
     return handleResponse(response);
   }
 
+  public MovieDetailsResponse getMoveDetailsByTitleAndYear(final String title, final int year) {
+    final var response =
+        Optional.ofNullable(
+                omdbApiRestClient
+                    .get()
+                    .uri("?apikey={apiKey}&t={title}&y={year}", apiKey, title, year)
+                    .accept(APPLICATION_JSON)
+                    .retrieve()
+                    .body(MovieDetailsResponse.class))
+            .orElseThrow(
+                () -> new ApiClientException("error in getting move details by title " + title));
+
+    return handleResponse(response);
+  }
+
   private <T extends OmdbBaseResponse> T handleResponse(final T resp) {
     if ("False".equalsIgnoreCase(resp.getResponse())) {
       switch (resp.getError()) {

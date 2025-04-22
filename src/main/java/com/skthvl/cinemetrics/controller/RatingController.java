@@ -1,9 +1,14 @@
 package com.skthvl.cinemetrics.controller;
 
 import com.skthvl.cinemetrics.mapper.RatingMapper;
+import com.skthvl.cinemetrics.model.dto.AddRatingDto;
+import com.skthvl.cinemetrics.model.request.CreateRatingRequest;
+import com.skthvl.cinemetrics.model.response.MessageResponse;
 import com.skthvl.cinemetrics.model.response.RatingResponse;
+import com.skthvl.cinemetrics.model.response.TopRatedMovieResponse;
 import com.skthvl.cinemetrics.service.RatingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +16,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/movies")
+@RequestMapping("/api/v1/ratings")
 public class RatingController {
 
   private final RatingService ratingService;
@@ -27,7 +33,7 @@ public class RatingController {
     this.ratingMapper = ratingMapper;
   }
 
-  @GetMapping("/{title}/ratings")
+  @GetMapping("/{title}")
   public ResponseEntity<List<RatingResponse>> getRatings(@PathVariable final String title) {
     final var ratingDto = ratingService.getRatingInfo(title);
 
@@ -35,13 +41,31 @@ public class RatingController {
   }
 
   @SecurityRequirement(name = "bearerAuth")
-  @PostMapping("/{title}/ratings")
-  public ResponseEntity<String> creatRating(
-      final Authentication authentication, @PathVariable final String title) {
+  @PostMapping()
+  public ResponseEntity<MessageResponse> createRating(
+      final Authentication authentication, @RequestBody @Valid final CreateRatingRequest request) {
 
     final var userName = authentication.getName();
     log.info("User name: {}", userName);
 
-    return ResponseEntity.ok(String.format("Rating created for %s", title));
+    final AddRatingDto rating =
+        AddRatingDto.builder()
+            .movieId(request.getMovieId())
+            .rating(request.getRating())
+            .comment(request.getComment())
+            .userName(userName)
+            .build();
+
+    ratingService.addRating(rating);
+
+    return ResponseEntity.ok(new MessageResponse("rating created successfully"));
+  }
+
+  @GetMapping("/top-10")
+  public ResponseEntity<List<TopRatedMovieResponse>> getTop10Ratings() {
+
+    final var topRatedMovies = ratingService.getTop10RatedMovies();
+
+    return ResponseEntity.ok(ratingMapper.toTopRatedMovieResponse(topRatedMovies));
   }
 }

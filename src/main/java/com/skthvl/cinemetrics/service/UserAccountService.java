@@ -35,7 +35,7 @@ public class UserAccountService {
             .build();
 
     userAccountRepository.save(userAccount);
-    log.info("User registered successfully: {}", userDto.userName());
+    log.info("User registered successfully: {}", userAccount);
   }
 
   public boolean isUserCredentialValid(final UserDto userDto) {

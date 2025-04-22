@@ -1,6 +1,7 @@
 package com.skthvl.cinemetrics.client.omdb.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.math.BigInteger;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -90,4 +91,8 @@ public class MovieDetailsResponse implements OmdbBaseResponse {
 
   @JsonProperty("Error")
   private String error;
+
+  public BigInteger parseBoxOffice() {
+    return BigInteger.valueOf(Long.parseLong(boxOffice.replaceAll("[^\\d.]", "")));
+  }
 }

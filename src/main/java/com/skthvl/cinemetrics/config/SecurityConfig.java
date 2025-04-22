@@ -52,12 +52,13 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(
                         "/api/v1/hello",
+                        "/api/v1/users",
                         "/api/v1/movies/{title}",
                         "/api/v1/movies/{title}/oscar/",
                         "/api/v1/login")
                     .permitAll()
                     .requestMatchers(
-                        "/api/v1/logout", "/api/v1/users", "/api/v1/movies/{title}/ratings")
+                        "/api/v1/ratings", "/api/v1/ratings/{title}", "/api/v1/logout")
                     .authenticated()
                     .anyRequest()
                     .denyAll())

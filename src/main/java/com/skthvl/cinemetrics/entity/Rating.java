@@ -3,6 +3,7 @@ package com.skthvl.cinemetrics.entity;
 import jakarta.persistence.*;
 import java.math.BigInteger;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Rating extends Auditable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

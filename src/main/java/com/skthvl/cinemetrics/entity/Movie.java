@@ -25,4 +25,8 @@ public class Movie {
 
   @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
   private BigInteger boxOfficeAmountUsd;
+
+  public boolean isBoxOfficeEmpty() {
+    return boxOfficeAmountUsd == null || BigInteger.ZERO.equals(boxOfficeAmountUsd);
+  }
 }
