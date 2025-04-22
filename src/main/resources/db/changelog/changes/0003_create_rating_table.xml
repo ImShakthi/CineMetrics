@@ -29,10 +29,11 @@
             </column>
         </createTable>
 
-<!--        <addCheckConstraint-->
-<!--                tableName="rating"-->
-<!--                constraintName="chk_rating_range"-->
-<!--                checkConstraint="rating BETWEEN 1 AND 100"/>-->
+        <sql>
+            ALTER TABLE rating
+                ADD CONSTRAINT chk_rating_range
+                    CHECK (rating BETWEEN 1 AND 100);
+        </sql>
 
         <addForeignKeyConstraint
                 baseTableName="rating"
@@ -48,5 +49,7 @@
                 referencedColumnNames="id"
                 constraintName="fk_rating_user_account"/>
 
+        <addUniqueConstraint tableName="rating" columnNames="movie_id,user_account_id"
+                             constraintName="uk_movie_id_user_account_id"/>
     </changeSet>
 </databaseChangeLog>
