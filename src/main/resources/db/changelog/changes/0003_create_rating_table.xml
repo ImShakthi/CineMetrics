@@ -40,16 +40,22 @@
                 baseColumnNames="movie_id"
                 referencedTableName="movie"
                 referencedColumnNames="id"
-                constraintName="fk_rating_movie"/>
+                constraintName="fk_rating_movie"
+                onDelete="CASCADE"/>
 
         <addForeignKeyConstraint
                 baseTableName="rating"
                 baseColumnNames="user_account_id"
                 referencedTableName="user_account"
                 referencedColumnNames="id"
-                constraintName="fk_rating_user_account"/>
+                constraintName="fk_rating_user_account"
+                onDelete="CASCADE"/>
 
         <addUniqueConstraint tableName="rating" columnNames="movie_id,user_account_id"
                              constraintName="uk_movie_id_user_account_id"/>
+
+        <createIndex indexName="idx_rating_movie_id" tableName="rating">
+            <column name="movie_id"/>
+        </createIndex>
     </changeSet>
 </databaseChangeLog>

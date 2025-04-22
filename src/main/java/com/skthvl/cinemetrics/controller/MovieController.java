@@ -43,10 +43,14 @@ public class MovieController {
       @RequestParam(name = "category", required = false) final String category) {
 
     final var movieAwards =
-        nominationInfoService.getMovieAwardInfo(title).stream()
+        nominationInfoService.getMovieAwardInfo(title, getCategory(category)).stream()
             .map(movieMapper::toMovieAwardInfoResponse)
             .toList();
 
     return ResponseEntity.ok(movieAwards);
+  }
+
+  private String getCategory(final String category) {
+    return (category == null) ? "best picture" : category;
   }
 }

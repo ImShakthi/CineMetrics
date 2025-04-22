@@ -15,21 +15,23 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
   }
 
-  @ExceptionHandler(MovieNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleMovieNotFoundException(
-      final MovieNotFoundException ex) {
+  @ExceptionHandler({
+    MovieNotFoundException.class,
+    UserDoesNotExistException.class,
+    UserNameAlreadyExistException.class
+  })
+  public ResponseEntity<ErrorResponse> handleMovieNotFoundException(final Exception ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
   }
 
-  @ExceptionHandler(InvalidApiKeyException.class)
-  public ResponseEntity<ErrorResponse> handleInvalidApiKeyException(
-      final InvalidApiKeyException ex) {
+  @ExceptionHandler({InvalidApiKeyException.class, InvalidCredentialException.class})
+  public ResponseEntity<ErrorResponse> handleInvalidApiKeyException(final Exception ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGeneric(final Exception ex) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new ErrorResponse("something went wrong"));
+        .body(new ErrorResponse("something went wrong, please try again later"));
   }
 }

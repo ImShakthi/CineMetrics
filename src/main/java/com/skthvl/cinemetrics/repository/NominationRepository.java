@@ -8,11 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface NominationRepository extends JpaRepository<Nomination, Long> {
-  @Query(value = """ 
+  @Query(
+      value =
+          """
           SELECT new com.skthvl.cinemetrics.model.dto.MovieAwardDto(n.releaseYear, n.hasWon)
           FROM Nomination n
           JOIN n.movie m
-          WHERE LOWER(m.title) = LOWER(:title)
+          WHERE LOWER(m.title) = LOWER(:title) AND LOWER(n.category) = LOWER(:category)
           """)
-  List<MovieAwardDto> findAwardDetailsByTitleIgnoreCase(@Param("title") final String title);
+  List<MovieAwardDto> findAwardDetailsByTitleIgnoreCase(
+      @Param("title") final String title, @Param("category") final String category);
 }

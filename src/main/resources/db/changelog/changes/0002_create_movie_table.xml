@@ -19,6 +19,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
         <addUniqueConstraint tableName="movie" columnNames="title,release_year" constraintName="uk_movie_title_year"/>
+
+        <createIndex indexName="idx_movie_box_office_amount_usd" tableName="movie">
+            <column name="box_office_amount_usd"/>
+        </createIndex>
     </changeSet>
 </databaseChangeLog>

@@ -84,8 +84,8 @@
             <version>8.0.1.Final</version>
         </dependency>
         <dependency>
-            <groupId>com.github.ulisesbocchio.jasypt-spring-boot</groupId>
-            <artifactId>jasypt-spring-boot</artifactId>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
             <version>3.0.5</version>
         </dependency>
         <dependency>

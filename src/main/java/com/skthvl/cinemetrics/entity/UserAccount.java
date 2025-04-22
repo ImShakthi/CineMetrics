@@ -3,7 +3,10 @@ package com.skthvl.cinemetrics.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class UserAccount extends Auditable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +30,7 @@ public class UserAccount extends Auditable {
   @Column(nullable = false)
   @NotBlank
   private String passwordHash;
+
+  @OneToMany(mappedBy = "ratedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Rating> ratings = new ArrayList<>();
 }

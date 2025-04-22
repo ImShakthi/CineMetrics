@@ -5,10 +5,13 @@ import com.skthvl.cinemetrics.model.dto.RatingDto;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
 
-  @Query("""
+  @Query(
+      """
           SELECT new com.skthvl.cinemetrics.model.dto.RatingDto(r.rating, m.title, u.name, r.comment) FROM Rating r
           JOIN r.movie m
           JOIN r.ratedBy u

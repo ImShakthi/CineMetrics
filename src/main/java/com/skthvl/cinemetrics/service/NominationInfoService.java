@@ -17,8 +17,9 @@ public class NominationInfoService {
     this.nominationRepository = nominationRepository;
   }
 
-  public List<MovieAwardDto> getMovieAwardInfo(final String title) {
-    final var awardDetails = nominationRepository.findAwardDetailsByTitleIgnoreCase(title);
+  public List<MovieAwardDto> getMovieAwardInfo(final String title, final String category) {
+    final var awardDetails =
+        nominationRepository.findAwardDetailsByTitleIgnoreCase(title, category);
     if (awardDetails.isEmpty()) {
       throw new MovieNotFoundException("Movie not found for title: " + title);
     }
