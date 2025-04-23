@@ -4,8 +4,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,14 @@ public class JwtTokenProvider {
     this.jwtExpirationInMilliseconds = jwtExpirationInMilliseconds;
   }
 
+  public String extractTokenFromHeader(final HttpServletRequest request) {
+    String bearer = request.getHeader("Authorization");
+    if (bearer != null && bearer.startsWith("Bearer ")) {
+      return bearer.substring(7);
+    }
+    return null;
+  }
+
   // generate JWT token
   public String generateToken(final String subject) {
     return generateToken(subject, new Date(System.currentTimeMillis()));
@@ -38,6 +48,7 @@ public class JwtTokenProvider {
         .subject(subject)
         .issuedAt(currentDate)
         .expiration(expireDate)
+        .id(UUID.randomUUID().toString())
         .signWith(key())
         .compact();
   }
@@ -49,6 +60,15 @@ public class JwtTokenProvider {
         .parseSignedClaims(token)
         .getPayload()
         .getSubject();
+  }
+
+  public String extractJtiId(final String token) {
+    return Jwts.parser()
+        .verifyWith((SecretKey) key())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .getId();
   }
 
   // validate JWT token

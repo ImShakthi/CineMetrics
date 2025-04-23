@@ -10,11 +10,14 @@ import com.skthvl.cinemetrics.exception.ApiClientException;
 import com.skthvl.cinemetrics.exception.InvalidApiKeyException;
 import com.skthvl.cinemetrics.exception.MovieNotFoundException;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
+@Slf4j
 @Configuration
 public class OmdbApiClient {
 
@@ -27,7 +30,9 @@ public class OmdbApiClient {
     this.omdbApiRestClient = omdbApiRestClient;
   }
 
+  @Cacheable(value = "movies", key = "#title")
   public MovieDetailsResponse getMoveDetailsByTitle(final String title) {
+    log.info("getting movie details by title: {}", title);
     final var response =
         Optional.ofNullable(
                 omdbApiRestClient
@@ -42,7 +47,9 @@ public class OmdbApiClient {
     return handleResponse(response);
   }
 
+  @Cacheable(value = "movie", key = "#title+'-'+#year")
   public MovieDetailsResponse getMoveDetailsByTitleAndYear(final String title, final int year) {
+    log.info("getting movie details by title: {} and year: {}", title, year);
     final var response =
         Optional.ofNullable(
                 omdbApiRestClient

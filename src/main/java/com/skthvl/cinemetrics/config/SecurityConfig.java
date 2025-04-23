@@ -27,6 +27,27 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
+  private static final String[] PUBLIC_NON_APP_APIs =
+      new String[] {
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/api-docs/**",
+        "/h2-console/**",
+        "/webjars/**",
+        "/swagger-resources/**",
+        "/configuration/ui",
+        "/configuration/security"
+      };
+
+  private static final String[] PUBLIC_APP_APIs =
+      new String[] {
+        "/api/v1/users", "/api/v1/movies/{title}", "/api/v1/movies/{title}/oscar/", "/api/v1/login"
+      };
+
+  private static final String[] AUTH_APP_APIs =
+      new String[] {"/api/v1/ratings", "/api/v1/ratings/{title}", "/api/v1/ratings/top-10","/api/v1/logout"};
+
   private final JwtAuthenticationFilter jwtFilter;
 
   public SecurityConfig(final JwtAuthenticationFilter jwtFilter) {
@@ -39,32 +60,25 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/api-docs/**",
-                        "/h2-console/**",
-                        "/webjars/**",
-                        "/swagger-resources/**",
-                        "/configuration/ui",
-                        "/configuration/security")
+                auth
+                    // public apis (without JWT)
+                    .requestMatchers(PUBLIC_NON_APP_APIs)
                     .permitAll()
-                    .requestMatchers(
-                        "/api/v1/hello",
-                        "/api/v1/users",
-                        "/api/v1/movies/{title}",
-                        "/api/v1/movies/{title}/oscar/",
-                        "/api/v1/login")
+                    .requestMatchers(PUBLIC_APP_APIs)
                     .permitAll()
-                    .requestMatchers(
-                        "/api/v1/ratings", "/api/v1/ratings/{title}", "/api/v1/logout")
+
+                    // auth apis (with JWT)
+                    .requestMatchers(AUTH_APP_APIs)
                     .authenticated()
+
+                    // Other APIs
                     .anyRequest()
                     .denyAll())
 
         // Stateless session (required for JWT)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+
+        // added JWT filter
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
         // Exception handling
@@ -77,7 +91,7 @@ public class SecurityConfig {
                         (request, response, accessDeniedException) ->
                             response.sendError(HttpServletResponse.SC_NOT_FOUND)))
 
-        // FOR H2 CONSOLE
+        // for h2 console
         .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
 
     return http.build();
@@ -93,7 +107,9 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(
-        List.of("http://localhost:8080", "http://localhost:3000")); // only allow your frontend
+        List.of(
+            "http://localhost:8080",
+            "http://localhost:3000")); // to allow frontend and swagger ui to access the APIs
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true); // required if using cookies or Authorization headers
