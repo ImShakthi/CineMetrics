@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.skthvl.cinemetrics.entity.Movie;
 import com.skthvl.cinemetrics.entity.Nomination;
+import com.skthvl.cinemetrics.repository.DataFileMigrationRepository;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.NominationRepository;
 import java.math.BigInteger;
@@ -28,11 +29,14 @@ class AcademyAwardLoaderTest {
 
   @Mock private NominationRepository nominationRepository;
 
+  @Mock private DataFileMigrationRepository dataFileMigrationRepository;
+
   @InjectMocks private AcademyAwardLoader testLoader;
 
   @BeforeEach
   void setUp() {
-    testLoader = new AcademyAwardLoader(movieRepository, nominationRepository);
+    testLoader =
+        new AcademyAwardLoader(movieRepository, nominationRepository, dataFileMigrationRepository);
 
     ReflectionTestUtils.setField(testLoader, "csvPath", "test-data-academy-awards.csv");
   }

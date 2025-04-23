@@ -8,6 +8,6 @@
     <include file="changes/0002_create_movie_table.xml" relativeToChangelogFile="true"/>
     <include file="changes/0003_create_rating_table.xml" relativeToChangelogFile="true"/>
     <include file="changes/0004_create_nomination_table.xml" relativeToChangelogFile="true"/>
-    <include file="changes/0005_load_academy_awards_nomination_table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/0005_create_data_file_migration_table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -11,6 +11,7 @@ import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.RatingRepository;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
+import java.math.BigInteger;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -50,7 +51,9 @@ public class RatingService {
     log.debug("User account exists: {}", ratingDto.userName());
 
     final var movie =
-        movieRepository.findById(ratingDto.movieId()).orElseThrow(MovieNotFoundException::new);
+        movieRepository
+            .findById(BigInteger.valueOf(ratingDto.movieId()))
+            .orElseThrow(MovieNotFoundException::new);
     log.debug("Movie exists: {}", movie.getTitle());
 
     if (movie.isBoxOfficeEmpty()) {

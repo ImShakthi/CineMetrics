@@ -73,7 +73,7 @@ class RatingServiceTest {
     movie.setReleaseYear(2010);
     movie.setBoxOfficeAmountUsd(null); // simulate missing box office
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
-    when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
+    when(movieRepository.findById(BigInteger.ONE)).thenReturn(Optional.of(movie));
 
     when(omdbApiClient.getMoveDetailsByTitleAndYear("Inception", 2010)).thenReturn(omdbResponse);
     when(omdbResponse.parseBoxOffice()).thenReturn(new BigInteger("825532764"));
@@ -95,10 +95,10 @@ class RatingServiceTest {
 
   @Test
   void addRating_shouldThrowMovieNotFoundException_whenMovieNotFound() {
-    AddRatingDto addRatingDto = new AddRatingDto(42, 5L, "test_user_name", "Nice");
+    AddRatingDto addRatingDto = new AddRatingDto(42, 1L, "test_user_name", "Nice");
     UserAccount user = new UserAccount();
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
-    when(movieRepository.findById(5L)).thenReturn(Optional.empty());
+    when(movieRepository.findById(BigInteger.ONE)).thenReturn(Optional.empty());
 
     assertThrows(MovieNotFoundException.class, () -> ratingService.addRating(addRatingDto));
   }
@@ -112,7 +112,7 @@ class RatingServiceTest {
     movie.setBoxOfficeAmountUsd(BigInteger.TEN);
 
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
-    when(movieRepository.findById(1L)).thenReturn(Optional.of(movie));
+    when(movieRepository.findById(BigInteger.ONE)).thenReturn(Optional.of(movie));
     when(ratingRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 
     assertThrows(DuplicateRatingException.class, () -> ratingService.addRating(addRatingDto));

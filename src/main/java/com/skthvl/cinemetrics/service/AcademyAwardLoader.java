@@ -1,15 +1,20 @@
 package com.skthvl.cinemetrics.service;
 
 import static com.skthvl.cinemetrics.util.DateUtil.parseYearAndEdition;
-import static java.util.Objects.*;
+import static com.skthvl.cinemetrics.util.FileUtil.calculateChecksum;
 
+import com.skthvl.cinemetrics.entity.DataFileMigration;
 import com.skthvl.cinemetrics.entity.Movie;
 import com.skthvl.cinemetrics.entity.Nomination;
+import com.skthvl.cinemetrics.repository.DataFileMigrationRepository;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.NominationRepository;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -24,15 +29,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class AcademyAwardLoader {
 
   private static final String BEST_PICTURE = "BEST PICTURE";
+  private static final String ACADEMY_AWARDS_CSV_FILE = "ACADEMY_AWARDS_CSV_FILE";
 
   private final MovieRepository movieRepository;
   private final NominationRepository nominationRepository;
+  private final DataFileMigrationRepository dataFileMigrationRepository;
 
   @Value("${cinemetrics.data.csv.academy-award-path}")
   private String csvPath;
 
   @Transactional
   public void loadOscarNominations() {
+
+    if (hasDataAlreadyMigrated()) {
+      log.warn("Academy Awards data has already been migrated");
+      return;
+    }
+
     try (var reader = getCsvReader()) {
       final List<Nomination> nominations =
           reader
@@ -47,9 +60,25 @@ public class AcademyAwardLoader {
       nominationRepository.saveAll(nominations);
       log.info("Saved {} Oscar nominations for Best Picture", nominations.size());
 
+      dataFileMigrationRepository.save(
+          DataFileMigration.builder()
+              .name(ACADEMY_AWARDS_CSV_FILE)
+              .fileChecksum(calculateChecksum(csvPath, "SHA-256"))
+              .build());
     } catch (Exception e) {
       log.error("Error loading Academy Awards data", e);
     }
+  }
+
+  private boolean hasDataAlreadyMigrated() {
+    return dataFileMigrationRepository.findByName(ACADEMY_AWARDS_CSV_FILE).stream()
+        .findFirst()
+        .map(
+            migration -> {
+              final String currentChecksum = calculateChecksum(csvPath, "SHA-256");
+              return currentChecksum != null && currentChecksum.equals(migration.getFileChecksum());
+            })
+        .orElse(false);
   }
 
   private Nomination createNomination(final String[] data) {
@@ -89,15 +118,10 @@ public class AcademyAwardLoader {
     }
   }
 
-  private BufferedReader getCsvReader() {
-
-    log.info("Loading Academy Awards CSV from {}", csvPath);
-
-    final ClassLoader classLoader = AcademyAwardLoader.class.getClassLoader();
-    log.info("Classloader: {}", classLoader);
-
-    return new BufferedReader(
-        new InputStreamReader(requireNonNull(classLoader.getResourceAsStream(csvPath))));
+  private BufferedReader getCsvReader() throws URISyntaxException, IOException {
+    log.debug("Loading Academy Awards CSV from {}", csvPath);
+    final Path path = Path.of(ClassLoader.getSystemResource(csvPath).toURI());
+    return Files.newBufferedReader(path);
   }
 
   private Movie findOrCreateMovie(final String title, final int year) {
