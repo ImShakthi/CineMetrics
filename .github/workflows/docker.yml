@@ -40,19 +40,18 @@ jobs:
 #      - name: Push Docker image
 #        run: docker push imshakthi/cinemetrics-api:latest
 
-      - name: Log in to Heroku Container Registry
-        run: echo "${{ secrets.HEROKU_API_KEY }}" | docker login --username=_ --password-stdin registry.heroku.com
-
-      - name: Build Docker image
-        run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
-
-      - name: Push Docker image
-        run: docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
-
-      - name: Release app
+      - name: Install Heroku CLI # <- IMPORTANT!!! Make sure the cli is installed before using the action
         run: |
-          curl -n -X POST https://api.heroku.com/apps/${{ secrets.HEROKU_APP_NAME }}/releases \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}" \
-            -d '{"description":"Deploy from GitHub Actions"}'
+            curl https://cli-assets.heroku.com/install.sh | sh
+            - uses: akhileshns/heroku-deploy@v3.14.15 # This is the action
+              with:
+                heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+                heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+                heroku_email: ${{secrets.HEROKU_EMAIL}}
+                usedocker: true
+                docker_build_args: |
+                  NODE_ENV
+                  SECRET_KEY
+              env:
+                NODE_ENV: production
+                SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
