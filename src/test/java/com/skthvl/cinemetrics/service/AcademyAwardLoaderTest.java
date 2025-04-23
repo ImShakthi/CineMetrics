@@ -1,7 +1,10 @@
 package com.skthvl.cinemetrics.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.skthvl.cinemetrics.entity.Movie;
 import com.skthvl.cinemetrics.entity.Nomination;
@@ -12,7 +15,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -34,7 +39,7 @@ class AcademyAwardLoaderTest {
 
   @Test
   void testExecute_shouldSaveBestPictureNominations() {
-
+    // Given
     Movie mockMovie =
         Movie.builder()
             .title("Forrest Gump")
@@ -51,14 +56,13 @@ class AcademyAwardLoaderTest {
 
     when(movieRepository.findMovieByTitleAndReleaseYear("Forrest Gump", 1994))
         .thenReturn(List.of(mockMovie));
-    when(movieRepository.findMovieByTitleAndReleaseYear("Cavalcade", 1933))
-        .thenReturn(List.of());
+    when(movieRepository.findMovieByTitleAndReleaseYear("Cavalcade", 1933)).thenReturn(List.of());
     when(movieRepository.save(any(Movie.class))).thenReturn(mockMovie2);
 
-    // Act
+    // When
     testLoader.execute();
 
-    // Assert
+    // Then
     ArgumentCaptor<List<Nomination>> captor = ArgumentCaptor.forClass(List.class);
     verify(nominationRepository).saveAll(captor.capture());
     final List<Nomination> saved = captor.getValue();
