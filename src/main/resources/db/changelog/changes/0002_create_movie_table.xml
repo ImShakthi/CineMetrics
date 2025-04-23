@@ -6,7 +6,7 @@
 
     <changeSet id="0002_create_movie_table" author="sakthivel balasubramaniam">
         <createTable tableName="movie">
-            <column name="id" type="BIGINT UNSIGNED AUTO_INCREMENT" autoIncrement="true">
+            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="varchar(255)">

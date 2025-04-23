@@ -6,10 +6,10 @@
 
     <changeSet id="0004_create_nomination_table" author="sakthivel balasubramaniam">
         <createTable tableName="nomination">
-            <column name="id" type="BIGINT UNSIGNED AUTO_INCREMENT" autoIncrement="true">
+            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="movie_id" type="BIGINT">
+            <column name="movie_id" type="BIGINT UNSIGNED">
                 <constraints nullable="false"/>
             </column>
             <column name="release_year" type="int">

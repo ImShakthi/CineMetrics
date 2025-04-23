@@ -6,7 +6,7 @@
 
     <changeSet id="0001_create_user_table" author="sakthivel balasubramaniam">
         <createTable tableName="user_account">
-            <column name="id" type="BIGINT UNSIGNED AUTO_INCREMENT" autoIncrement="true">
+            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">

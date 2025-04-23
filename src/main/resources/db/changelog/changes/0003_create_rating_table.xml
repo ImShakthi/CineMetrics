@@ -6,25 +6,24 @@
 
     <changeSet id="0003_create_rating_table" author="sakthivel balasubramaniam">
         <createTable tableName="rating">
-            <column name="id" type="BIGINT UNSIGNED AUTO_INCREMENT" autoIncrement="true">
+            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="movie_id" type="BIGINT">
+            <column name="movie_id" type="BIGINT UNSIGNED">
                 <constraints nullable="false"/>
             </column>
-            <column name="user_account_id" type="BIGINT">
+            <column name="user_account_id" type="BIGINT UNSIGNED">
                 <constraints nullable="false"/>
             </column>
             <column name="rating" type="int">
                 <constraints nullable="false" checkConstraint="BETWEEN 1 AND 100"/>
             </column>
-            <column name="comment" type="varchar2">
+            <column name="comment" type="varchar(255)">
             </column>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="TIMESTAMP"
-                    defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP">
+            <column name="updated_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>

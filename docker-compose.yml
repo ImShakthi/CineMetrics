@@ -1,0 +1,42 @@
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_DATABASE=cinemetrics
+      - MYSQL_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  app:
+    build: .
+    depends_on:
+      - redis
+      - mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/cinemetrics
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+      - JASYPT_ENCRYPTOR_PASSWORD=${JASYPT_ENCRYPTOR_PASSWORD}
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    command: [ "sh", "-c", "/wait-for-it.sh mysql:3306 -- java -jar app.jar"]
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
