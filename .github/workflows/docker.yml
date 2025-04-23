@@ -33,11 +33,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: imshakthi/cinemetrics-api
+          images: |
+            imshakthi/cinemetrics-api
           tags: |
-            type=sha
             type=ref,event=branch
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - name: 🔐 Log in to Docker Hub
         uses: docker/login-action@v3
@@ -45,14 +47,17 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: 🏗️ Build Docker image
-        run: |
-          for tag in ${{ steps.meta.outputs.tags }}; do
-            docker build -t "$tag" .
-          done
+      - name: 🏗️ Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: 📤 Push Docker image
-        run: |
-          for tag in ${{ steps.meta.outputs.tags }}; do
-            docker push "$tag"
-          done
+
+#      - name: Build Docker image
+#        run: docker build -t imshakthi/cinemetrics-api:latest .
+#
+#      - name: Push Docker image
+#        run: docker push imshakthi/cinemetrics-api:latest
