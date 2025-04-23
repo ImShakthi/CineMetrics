@@ -42,8 +42,8 @@ public class MovieController {
   }
 
   @GetMapping("/{title}/oscar/")
-  public ResponseEntity<List<MovieAwardInfoResponse>> checkMovieWonBestPictureAward(
-      @PathVariable @NotBlank(message = "title must not be empty") final String title,
+  public ResponseEntity<List<MovieAwardInfoResponse>> checkMovieWonAwardsByTitle(
+      @PathVariable final String title,
       @RequestParam(name = "category", required = false) final String category) {
 
     final var movieAwards =

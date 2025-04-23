@@ -2,6 +2,7 @@ package com.skthvl.cinemetrics.controller;
 
 import com.skthvl.cinemetrics.model.dto.UserDto;
 import com.skthvl.cinemetrics.model.request.CreateUserRequest;
+import com.skthvl.cinemetrics.model.request.DeleteUserRequest;
 import com.skthvl.cinemetrics.model.response.MessageResponse;
 import com.skthvl.cinemetrics.service.UserAccountService;
 import jakarta.validation.Valid;
@@ -32,7 +33,7 @@ public class UserController {
 
   @DeleteMapping
   public ResponseEntity<MessageResponse> deleteUser(
-      @RequestBody @Valid final CreateUserRequest request) {
+      @RequestBody @Valid final DeleteUserRequest request) {
     userAccountService.deleteUser(new UserDto(request.getUsername(), request.getPassword()));
 
     return ResponseEntity.ok(new MessageResponse("user deleted successfully"));

@@ -37,8 +37,8 @@ cinemetrics:
     expiration-in-minutes: 60
   client:
     omdbapi:
-      base-url: http://www.omdbapi.com
-      api-key: ENC(UEdk0nPfbYJNozHC2VyPHjnfp2S+DGCl)
+      base-url: http://localhost:${wiremock.server.port}
+      api-key: test-api-key
   openapi:
     dev-url: http://localhost:8080
     prod-url: http://localhost:8080
