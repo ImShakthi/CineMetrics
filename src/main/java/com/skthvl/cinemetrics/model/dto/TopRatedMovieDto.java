@@ -1,11 +1,19 @@
 package com.skthvl.cinemetrics.model.dto;
 
 import java.math.BigInteger;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public interface TopRatedMovieDto {
-  String getTitle();
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class TopRatedMovieDto {
+  private String title;
 
-  double getAverageRating();
+  private double averageRating;
 
-  BigInteger getBoxOfficeAmountUsd();
+  private BigInteger boxOfficeAmountUsd;
 }

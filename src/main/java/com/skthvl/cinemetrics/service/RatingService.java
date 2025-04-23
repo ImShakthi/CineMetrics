@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -35,29 +36,30 @@ public class RatingService {
     this.omdbApiClient = omdbApiClient;
   }
 
+  @Transactional(readOnly = true)
   public List<RatingDto> getRatingInfo(final String title) {
     return ratingRepository.findRatingDetailsByTitleIgnoreCase(title);
   }
 
+  @Transactional
   public void addRating(final AddRatingDto ratingDto) {
     final var userAccount =
         userAccountRepository
             .findByName(ratingDto.userName())
             .orElseThrow(UserDoesNotExistException::new);
-    log.info("User account exists: {}", ratingDto.userName());
+    log.debug("User account exists: {}", ratingDto.userName());
 
     final var movie =
         movieRepository.findById(ratingDto.movieId()).orElseThrow(MovieNotFoundException::new);
-    log.info("Movie exists: {}", movie.getTitle());
+    log.debug("Movie exists: {}", movie.getTitle());
 
     if (movie.isBoxOfficeEmpty()) {
       final var movieDetails =
           omdbApiClient.getMoveDetailsByTitleAndYear(movie.getTitle(), movie.getReleaseYear());
 
       movie.setBoxOfficeAmountUsd(movieDetails.parseBoxOffice());
-      log.info("Box office amount updated: {}", movie.getBoxOfficeAmountUsd());
+      log.debug("Box office amount updated: {}", movie.getBoxOfficeAmountUsd());
     }
-
     final var rating =
         Rating.builder()
             .rating(ratingDto.rating())
@@ -68,16 +70,14 @@ public class RatingService {
 
     try {
       ratingRepository.save(rating);
-      log.info(
-          "successfully added rating for movie {} by user {}",
-          movie.getTitle(),
-          ratingDto.userName());
+      log.info("added rating for movie {} by user {}", movie.getTitle(), ratingDto.userName());
     } catch (DataIntegrityViolationException ex) {
       log.error("error adding rating {}", ex.getMessage());
       throw new DuplicateRatingException();
     }
   }
 
+  @Transactional(readOnly = true)
   public List<TopRatedMovieDto> getTop10RatedMovies() {
     return ratingRepository.getTop10RatedMoviesOrderByBoxOffice();
   }

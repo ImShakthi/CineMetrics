@@ -16,6 +16,7 @@ import com.skthvl.cinemetrics.exception.MovieNotFoundException;
 import com.skthvl.cinemetrics.exception.UserDoesNotExistException;
 import com.skthvl.cinemetrics.model.dto.AddRatingDto;
 import com.skthvl.cinemetrics.model.dto.RatingDto;
+import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.RatingRepository;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
@@ -115,5 +116,23 @@ class RatingServiceTest {
     when(ratingRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 
     assertThrows(DuplicateRatingException.class, () -> ratingService.addRating(addRatingDto));
+  }
+
+  @Test
+  void shouldReturnTop10RatedMovies() {
+    // Given
+    List<TopRatedMovieDto> mockTop10 =
+        List.of(
+            new TopRatedMovieDto("Inception", 95.9, BigInteger.valueOf(800000000)),
+            new TopRatedMovieDto("Interstellar", 94.8, BigInteger.valueOf(700000000)));
+
+    when(ratingRepository.getTop10RatedMoviesOrderByBoxOffice()).thenReturn(mockTop10);
+
+    // When
+    final List<TopRatedMovieDto> result = ratingService.getTop10RatedMovies();
+
+    // Then
+    assertEquals(mockTop10, result);
+    verify(ratingRepository).getTop10RatedMoviesOrderByBoxOffice();
   }
 }

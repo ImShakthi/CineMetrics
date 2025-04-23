@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ public class AcademyAwardLoader {
               .map(this::parseCsvLine)
               .filter(data -> BEST_PICTURE.equalsIgnoreCase(data[1].trim()))
               .map(this::createNomination)
+              .filter(Objects::nonNull)
               .toList();
 
       nominationRepository.saveAll(nominations);
@@ -63,18 +65,28 @@ public class AcademyAwardLoader {
 
     final int releaseYear = yearAndEdition.getFirst();
     final int edition = yearAndEdition.getLast();
-    final Movie movie = findOrCreateMovie(nominee, releaseYear);
 
-    return Nomination.builder()
-        .movie(movie)
-        .awardType("OSCAR")
-        .category(BEST_PICTURE)
-        .releaseYear(releaseYear)
-        .edition(edition)
-        .hasWon(hasWon)
-        .nominee(nominee)
-        .additionalInfo(additionalInfo)
-        .build();
+    try {
+      final Movie movie = findOrCreateMovie(nominee, releaseYear);
+
+      return Nomination.builder()
+          .movie(movie)
+          .awardType("OSCAR")
+          .category(BEST_PICTURE)
+          .releaseYear(releaseYear)
+          .edition(edition)
+          .hasWon(hasWon)
+          .nominee(nominee)
+          .additionalInfo(additionalInfo)
+          .build();
+    } catch (Exception e) {
+      log.error(
+          "Error creating nomination for movie {} and year {} :: {}",
+          nominee,
+          releaseYear,
+          e.getMessage());
+      return null;
+    }
   }
 
   private BufferedReader getCsvReader() {
