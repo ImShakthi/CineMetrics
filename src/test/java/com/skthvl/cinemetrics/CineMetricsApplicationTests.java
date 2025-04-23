@@ -1,6 +1,7 @@
 package com.skthvl.cinemetrics;
 
 import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitle;
+import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitleAndYear;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -106,18 +107,18 @@ class CineMetricsApplicationTests {
     // get movie details
     assertGetMovieDetails(title);
 
-    //    stubGetMoveDetailsByTitleAndYear(title, "1994");
-    //    // get movie award details
-    //    final var response =
-    //        given()
-    //            .basePath("/api/v1/movies/{title}/oscar")
-    //            .pathParam("title", title)
-    //            .when()
-    //            .get()
-    //            .then()
-    //            .statusCode(200)
-    //            .extract()
-    //            .response();
+    stubGetMoveDetailsByTitleAndYear(title, "1994");
+    // get movie award details
+    final var response =
+        given()
+            .basePath("/api/v1/movies/{title}/oscar")
+            .pathParam("title", title)
+            .when()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .response();
   }
 
   private void assertCreateUser(final String createUserJsonBody) {

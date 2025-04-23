@@ -13,13 +13,13 @@ public class InvalidatedTokenService {
 
   @CachePut(value = "invalidated-tokens", key = "#token")
   public boolean invalidateToken(final String token) {
-    log.info("invalidating token: {}", token);
+    log.debug("invalidating token: {}", token);
     return true;
   }
 
   @Cacheable(value = "invalidated-tokens", key = "#token")
   public boolean isTokenInvalidated(final String token) {
-    log.info("checking if token is invalidated: {}", token);
+    log.debug("checking if token is invalidated: {}", token);
 
     // by default, token is not invalidated
     return false;

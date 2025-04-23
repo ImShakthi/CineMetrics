@@ -42,7 +42,7 @@ public class SecurityConfig {
 
   private static final String[] PUBLIC_APP_APIs =
       new String[] {
-        "/api/v1/users", "/api/v1/movies/{title}", "/api/v1/movies/{title}/oscar/", "/api/v1/login"
+        "/api/v1/users", "/api/v1/movies/{title}", "/api/v1/movies/{title}/oscar", "/api/v1/login"
       };
 
   private static final String[] AUTH_APP_APIs =

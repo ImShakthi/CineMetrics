@@ -29,8 +29,6 @@ public class ApiLoggingFilter extends OncePerRequestFilter {
     final ContentCachingResponseWrapper response = new ContentCachingResponseWrapper(res);
 
     try {
-      log.info(
-          "Request: {} {} {}", request.getMethod(), request.getRequestURI(), request.getContentType());
       chain.doFilter(request, response);
 
       if (!skipLogging(req)) {

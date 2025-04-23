@@ -41,7 +41,7 @@ public class MovieController {
     return ResponseEntity.ok(movieMapper.toMovieInfoResponse(movieDetails));
   }
 
-  @GetMapping("/{title}/oscar/")
+  @GetMapping("/{title}/oscar")
   public ResponseEntity<List<MovieAwardInfoResponse>> checkMovieWonAwardsByTitle(
       @PathVariable final String title,
       @RequestParam(name = "category", required = false) final String category) {
