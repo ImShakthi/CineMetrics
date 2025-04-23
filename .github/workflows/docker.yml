@@ -28,30 +28,15 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-#      - name: Log in to Docker Hub
-#        uses: docker/login-action@v3
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#
-#      - name: Build Docker image
-#        run: docker build -t imshakthi/cinemetrics-api:latest .
-#
-#      - name: Push Docker image
-#        run: docker push imshakthi/cinemetrics-api:latest
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Install Heroku CLI # <- IMPORTANT!!! Make sure the cli is installed before using the action
-        run: |
-            curl https://cli-assets.heroku.com/install.sh | sh
-            - uses: akhileshns/heroku-deploy@v3.14.15 # This is the action
-              with:
-                heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-                heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-                heroku_email: ${{secrets.HEROKU_EMAIL}}
-                usedocker: true
-                docker_build_args: |
-                  NODE_ENV
-                  SECRET_KEY
-              env:
-                NODE_ENV: production
-                SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+      - name: Build Docker image
+        run: docker build -t imshakthi/cinemetrics-api:latest .
+
+      - name: Push Docker image
+        run: docker push imshakthi/cinemetrics-api:latest
+
