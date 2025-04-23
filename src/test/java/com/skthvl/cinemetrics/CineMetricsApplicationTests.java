@@ -4,6 +4,7 @@ import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTit
 import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitleAndYear;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -107,18 +108,8 @@ class CineMetricsApplicationTests {
     // get movie details
     assertGetMovieDetails(title);
 
-    stubGetMoveDetailsByTitleAndYear(title, "1994");
     // get movie award details
-    final var response =
-        given()
-            .basePath("/api/v1/movies/{title}/oscar")
-            .pathParam("title", title)
-            .when()
-            .get()
-            .then()
-            .statusCode(200)
-            .extract()
-            .response();
+    assertGetAwardMovieDetails(title);
   }
 
   private void assertCreateUser(final String createUserJsonBody) {
@@ -189,5 +180,18 @@ class CineMetricsApplicationTests {
         .body("year", equalTo("2010"))
         .body("rated", equalTo("PG-13"))
         .body("released", equalTo("16 Jul 2010"));
+  }
+
+  private void assertGetAwardMovieDetails(final String title) {
+    stubGetMoveDetailsByTitleAndYear(title, "1994");
+    given()
+        .basePath("/api/v1/movies/{title}/oscar")
+        .pathParam("title", title)
+        .when()
+        .get()
+        .then()
+        .statusCode(200)
+        .body("releaseYear", hasItems(1994))
+        .body("hasWon", hasItems(true));
   }
 }
