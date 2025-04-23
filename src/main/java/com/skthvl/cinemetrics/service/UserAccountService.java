@@ -9,6 +9,7 @@ import com.skthvl.cinemetrics.repository.UserAccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -22,23 +23,39 @@ public class UserAccountService {
     this.userAccountRepository = userAccountRepository;
   }
 
+  @Transactional
   public void registerUser(final UserDto userDto) {
     if (userAccountRepository.existsByName(userDto.userName())) {
-      log.error("User name already exists: {}", userDto.userName());
-      throw new UserNameAlreadyExistException("user name already exists: " + userDto.userName());
+      log.warn("User name already exists: {}", userDto.userName());
+      throw new UserNameAlreadyExistException(
+          String.format("user name already exists: %s", userDto.userName()));
     }
 
-    final String passwordHash = passwordEncoder.encode(userDto.password());
-    log.info("Password hash generated: {}", passwordHash);
-
     final UserAccount userAccount =
-        UserAccount.builder().name(userDto.userName()).passwordHash(passwordHash).build();
+        UserAccount.builder()
+            .name(userDto.userName())
+            .passwordHash(passwordEncoder.encode(userDto.password()))
+            .build();
 
     userAccountRepository.save(userAccount);
     log.info("User registered successfully: {}", userDto.userName());
   }
 
+  @Transactional(readOnly = true)
   public boolean isUserCredentialValid(final UserDto userDto) {
+    validateCredentials(userDto);
+    return true;
+  }
+
+  @Transactional
+  public void deleteUser(final UserDto userDto) {
+    final var userAccount = validateCredentials(userDto);
+
+    userAccountRepository.delete(userAccount);
+    log.info("User account deleted successfully: {}", userDto.userName());
+  }
+
+  private UserAccount validateCredentials(final UserDto userDto) {
     final var userAccount =
         userAccountRepository
             .findByName(userDto.userName())
@@ -48,22 +65,7 @@ public class UserAccountService {
       throw new InvalidCredentialException();
     }
     log.info("User credential validated successfully: {}", userDto.userName());
-    return true;
-  }
 
-  public void deleteUser(final UserDto userDto) {
-    final var userAccount =
-        userAccountRepository
-            .findByName(userDto.userName())
-            .orElseThrow(UserDoesNotExistException::new);
-    log.info("User account exists: {}", userDto.userName());
-
-    if (!passwordEncoder.matches(userDto.password(), userAccount.getPasswordHash())) {
-      log.error("invalid password for user: {}", userDto.userName());
-      throw new InvalidCredentialException();
-    }
-
-    userAccountRepository.delete(userAccount);
-    log.info("User account deleted successfully: {}", userDto.userName());
+    return userAccount;
   }
 }

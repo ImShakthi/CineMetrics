@@ -32,7 +32,7 @@ public class WireMockStubs {
   public static void stubGetMoveDetailsByTitleAndYear(final String title, final String year) {
     stubFor(
         get(urlPathEqualTo("/"))
-            .withQueryParam("apikey", equalTo("testkey"))
+            .withQueryParam("apikey", equalTo("test-api-key"))
             .withQueryParam("t", equalTo(title))
             .withQueryParam("y", equalTo(year))
             .willReturn(

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @AutoConfigureWireMock(port = 0)
+@Slf4j
 class CineMetricsApplicationTests {
 
   static final MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8");
@@ -67,56 +69,113 @@ class CineMetricsApplicationTests {
 
   @Test
   void addAndDeleteUser() {
+    final var userName = "test_user_1";
+    final String jsonBody =
+        """
+          {"username":"%s","password":"password123"}
+          """
+            .formatted(userName);
+
     // create table
     userAccountRepository.deleteAll();
 
     // user not created yet
-    final var beforeUserCreated = userAccountRepository.findByName("test_user_1");
-    assertNotNull(beforeUserCreated);
-    assertTrue(beforeUserCreated.isEmpty());
+    assertUserDoesntExist(userName);
 
-    final String jsonBody =
-        """
-      {"username":"test_user_1","password":"password123"}
-      """;
-    given()
-        .basePath("/api/v1/users")
-        .contentType(ContentType.JSON)
-        .body(jsonBody)
-        .when()
-        .post()
-        .then()
-        .statusCode(201)
-        .body("message", equalTo("user created successfully"));
+    // create user
+    assertCreateUser(jsonBody);
 
-    // user is created yet
-    final var afterUserCreateCall = userAccountRepository.findByName("test_user_1");
-    assertNotNull(afterUserCreateCall);
-    assertTrue(afterUserCreateCall.isPresent());
+    // check user created
+    assertUserExists(userName);
 
-    given()
-        .basePath("/api/v1/users")
-        .contentType(ContentType.JSON)
-        .body(jsonBody)
-        .when()
-        .delete()
-        .then()
-        .statusCode(200)
-        .body("message", equalTo("user deleted successfully"));
+    // login and fetch token
+    final String token = getToken(jsonBody);
+    log.info("token: {}", token);
 
-    // user deleted
-    final var afterUserDeleted = userAccountRepository.findByName("test_user_1");
-    assertNotNull(afterUserDeleted);
-    assertTrue(afterUserDeleted.isEmpty());
+    // delete user
+    assertDeleteUser(jsonBody);
+
+    // check after user deleted
+    assertUserDoesntExist(userName);
   }
 
   @Test
   void getMovieDetailsAndCheckAwardDetails_whenMovieExists() {
     final String title = "Forrest Gump";
 
+    // get movie details
+    assertGetMovieDetails(title);
+
+    //    stubGetMoveDetailsByTitleAndYear(title, "1994");
+    //    // get movie award details
+    //    final var response =
+    //        given()
+    //            .basePath("/api/v1/movies/{title}/oscar")
+    //            .pathParam("title", title)
+    //            .when()
+    //            .get()
+    //            .then()
+    //            .statusCode(200)
+    //            .extract()
+    //            .response();
+  }
+
+  private void assertCreateUser(final String createUserJsonBody) {
+    given()
+        .basePath("/api/v1/users")
+        .contentType(ContentType.JSON)
+        .body(createUserJsonBody)
+        .when()
+        .post()
+        .then()
+        .statusCode(201)
+        .body("message", equalTo("user created successfully"));
+  }
+
+  private String getToken(final String loginRequestJsonBody) {
+    return given()
+        .basePath("/api/v1/login")
+        .contentType(ContentType.JSON)
+        .accept(ContentType.JSON)
+        .body(loginRequestJsonBody)
+        .when()
+        .post()
+        .then()
+        .statusCode(200)
+        .extract()
+        .response()
+        .body()
+        .jsonPath()
+        .getString("token");
+  }
+
+  private void assertDeleteUser(final String deleteUserJsonBody) {
+    given()
+        .basePath("/api/v1/users")
+        .contentType(ContentType.JSON)
+        .body(deleteUserJsonBody)
+        .when()
+        .delete()
+        .then()
+        .statusCode(200)
+        .body("message", equalTo("user deleted successfully"));
+  }
+
+  private void assertUserExists(final String userName) {
+    final var user = userAccountRepository.findByName(userName);
+    assertNotNull(user);
+    assertTrue(user.isPresent());
+  }
+
+  private void assertUserDoesntExist(final String userName) {
+    final var user = userAccountRepository.findByName(userName);
+    assertNotNull(user);
+    assertTrue(user.isEmpty());
+  }
+
+  private void assertGetMovieDetails(final String title) {
     stubGetMoveDetailsByTitle(title);
 
-    // get movie details
     given()
         .basePath("/api/v1/movies/{title}")
         .pathParam("title", title)
@@ -129,19 +188,5 @@ class CineMetricsApplicationTests {
         .body("year", equalTo("2010"))
         .body("rated", equalTo("PG-13"))
         .body("released", equalTo("16 Jul 2010"));
-
-    // get movie award details
-//    given()
-//        .basePath("/api/v1/movies/{title}/oscar")
-//        .pathParam("title", title)
-//        .accept(ContentType.JSON)
-//        .when()
-//        .get()
-//        .then()
-//        .statusCode(200)
-//        .body("title", equalTo("Forrest Gump"))
-//        .body("year", equalTo("2010"))
-//        .body("rated", equalTo("PG-13"))
-//        .body("released", equalTo("16 Jul 2010"));
   }
 }

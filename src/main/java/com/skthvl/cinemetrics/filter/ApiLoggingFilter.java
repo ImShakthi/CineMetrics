@@ -18,12 +18,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 public class ApiLoggingFilter extends OncePerRequestFilter {
 
   private static final List<String> SKIP_LOGGING_FOR_URI =
-      List.of(
-          "/api-docs",
-          "/swagger-ui",
-          "/h2-console",
-          "/api/v1/users",
-          "/api/v1/login");
+      List.of("/api-docs", "/swagger-ui", "/h2-console", "/api/v1/users", "/api/v1/login");
 
   @Override
   protected void doFilterInternal(
@@ -33,19 +28,24 @@ public class ApiLoggingFilter extends OncePerRequestFilter {
     final ContentCachingRequestWrapper request = new ContentCachingRequestWrapper(req);
     final ContentCachingResponseWrapper response = new ContentCachingResponseWrapper(res);
 
-    chain.doFilter(request, response);
+    try {
+      log.info(
+          "Request: {} {} {}", request.getMethod(), request.getRequestURI(), request.getContentType());
+      chain.doFilter(request, response);
 
-    if (!skipLogging(req)) {
-      log.info("Request: {} {}", request.getMethod(), request.getRequestURI());
-      Optional.of(new String(request.getContentAsByteArray(), request.getCharacterEncoding()))
-          .filter(s -> !s.isEmpty())
-          .ifPresent(log::info);
+      if (!skipLogging(req)) {
+        log.info("Request: {} {}", request.getMethod(), request.getRequestURI());
+        Optional.of(new String(request.getContentAsByteArray(), request.getCharacterEncoding()))
+            .filter(s -> !s.isEmpty())
+            .ifPresent(log::info);
 
-      Optional.of(new String(response.getContentAsByteArray(), response.getCharacterEncoding()))
-          .filter(s -> !s.isEmpty())
-          .ifPresent(log::info);
+        Optional.of(new String(response.getContentAsByteArray(), response.getCharacterEncoding()))
+            .filter(s -> !s.isEmpty())
+            .ifPresent(log::info);
+      }
+    } finally {
+      response.copyBodyToResponse();
     }
-    response.copyBodyToResponse();
   }
 
   private boolean skipLogging(final HttpServletRequest req) {
