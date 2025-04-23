@@ -28,14 +28,14 @@ public class UserAccountService {
       throw new UserNameAlreadyExistException("user name already exists: " + userDto.userName());
     }
 
+    final String passwordHash = passwordEncoder.encode(userDto.password());
+    log.info("Password hash generated: {}", passwordHash);
+
     final UserAccount userAccount =
-        UserAccount.builder()
-            .name(userDto.userName())
-            .passwordHash(passwordEncoder.encode(userDto.password()))
-            .build();
+        UserAccount.builder().name(userDto.userName()).passwordHash(passwordHash).build();
 
     userAccountRepository.save(userAccount);
-    log.info("User registered successfully: {}", userAccount);
+    log.info("User registered successfully: {}", userDto.userName());
   }
 
   public boolean isUserCredentialValid(final UserDto userDto) {

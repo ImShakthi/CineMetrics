@@ -5,11 +5,14 @@ import com.skthvl.cinemetrics.model.request.CreateUserRequest;
 import com.skthvl.cinemetrics.model.response.MessageResponse;
 import com.skthvl.cinemetrics.service.UserAccountService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@Validated
 public class UserController {
 
   private final UserAccountService userAccountService;
@@ -23,7 +26,8 @@ public class UserController {
       @RequestBody @Valid final CreateUserRequest request) {
     userAccountService.registerUser(new UserDto(request.getUsername(), request.getPassword()));
 
-    return ResponseEntity.ok(new MessageResponse("user created successfully"));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(new MessageResponse("user created successfully"));
   }
 
   @DeleteMapping

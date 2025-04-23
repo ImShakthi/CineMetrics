@@ -11,6 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateUserRequest {
-  @NotBlank private String username;
-  @NotBlank private String password;
+  @NotBlank(message = "username must not be empty")
+  private String username;
+
+  @NotBlank(message = "password must not be empty")
+  private String password;
 }

@@ -9,10 +9,12 @@ import com.skthvl.cinemetrics.model.response.TopRatedMovieResponse;
 import com.skthvl.cinemetrics.service.RatingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ratings")
+@Validated
 public class RatingController {
 
   private final RatingService ratingService;
@@ -34,7 +37,8 @@ public class RatingController {
   }
 
   @GetMapping("/{title}")
-  public ResponseEntity<List<RatingResponse>> getRatings(@PathVariable final String title) {
+  public ResponseEntity<List<RatingResponse>> getRatings(
+      @PathVariable @NotBlank(message = "title must not be empty") final String title) {
     final var ratingDto = ratingService.getRatingInfo(title);
 
     return ResponseEntity.ok(ratingMapper.toRatingResponse(ratingDto));

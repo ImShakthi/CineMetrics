@@ -5,14 +5,17 @@ import com.skthvl.cinemetrics.mapper.MovieMapper;
 import com.skthvl.cinemetrics.model.response.MovieAwardInfoResponse;
 import com.skthvl.cinemetrics.model.response.MovieInfoResponse;
 import com.skthvl.cinemetrics.service.NominationInfoService;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/movies")
 @Slf4j
+@Validated
 public class MovieController {
 
   private final OmdbApiClient omdbApiClient;
@@ -29,7 +32,8 @@ public class MovieController {
   }
 
   @GetMapping("/{title}")
-  public ResponseEntity<MovieInfoResponse> getMovieDetailsByTitle(@PathVariable String title) {
+  public ResponseEntity<MovieInfoResponse> getMovieDetailsByTitle(
+      @PathVariable @NotBlank(message = "title must not be empty") final String title) {
     final var movieDetails = omdbApiClient.getMoveDetailsByTitle(title);
 
     log.info("Movie Details: {}", movieDetails);
@@ -39,7 +43,7 @@ public class MovieController {
 
   @GetMapping("/{title}/oscar/")
   public ResponseEntity<List<MovieAwardInfoResponse>> checkMovieWonBestPictureAward(
-      @PathVariable final String title,
+      @PathVariable @NotBlank(message = "title must not be empty") final String title,
       @RequestParam(name = "category", required = false) final String category) {
 
     final var movieAwards =
