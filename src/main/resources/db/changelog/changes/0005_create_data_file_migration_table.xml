@@ -6,10 +6,10 @@
 
     <changeSet id="0006_create_data_file_migration_table" author="sakthivel balasubramaniam">
         <createTable tableName="data_file_migration">
-            <column name="id" type="BIGINT UNSIGNED" autoIncrement="true">
+            <column name="id" type="INT UNSIGNED" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(255)">
+            <column name="file_path" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="file_checksum" type="VARCHAR(255)">

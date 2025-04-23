@@ -1,12 +1,11 @@
 package com.skthvl.cinemetrics.repository;
 
 import com.skthvl.cinemetrics.entity.DataFileMigration;
-import java.math.BigInteger;
-import java.util.List;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DataFileMigrationRepository extends CrudRepository<DataFileMigration, BigInteger> {
-    List<DataFileMigration> findByName(String name);
+public interface DataFileMigrationRepository extends JpaRepository<DataFileMigration, Integer> {
+
+  boolean existsByFilePathAndFileChecksum(String filePath, String fileChecksum);
 }

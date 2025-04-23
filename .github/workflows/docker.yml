@@ -9,34 +9,45 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v2
+      - name: ☕ Set up JDK 21
+        uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: 'maven'
 
-      - name: Run unit tests
-        run: mvn test
+      - name: 🧪 Run Tests and Build
+        run: mvn verify
 
-      - name: Build with Maven
+      - name: 📦 Build JAR (skip tests)
         run: mvn clean package -DskipTests
 
-      - name: Log in to Docker Hub
+      - name: 🐳 Set up Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: imshakthi/cinemetrics-api
+          tags: |
+            type=sha
+            type=ref,event=branch
+
+      - name: 🔐 Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t imshakthi/cinemetrics-api:latest .
+      - name: 🏗️ Build Docker image
+        run: |
+          docker build -t ${{ steps.meta.outputs.tags }} .
 
-      - name: Push Docker image
-        run: docker push imshakthi/cinemetrics-api:latest
-
+      - name: 📤 Push Docker image
+        run: |
+          docker push ${{ steps.meta.outputs.tags }}

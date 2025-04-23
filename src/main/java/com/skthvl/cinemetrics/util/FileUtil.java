@@ -20,7 +20,7 @@ public class FileUtil {
         digest.update(buffer, 0, bytesRead);
       }
       byte[] checksumBytes = digest.digest();
-      return bytesToHex(checksumBytes);
+      return bytesToHex(checksumBytes).trim();
     } catch (Exception e) {
       log.error("Error getting checksum for file: {}", filePath, e);
     }

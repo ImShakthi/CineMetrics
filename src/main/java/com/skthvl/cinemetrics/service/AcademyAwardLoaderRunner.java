@@ -13,6 +13,6 @@ public class AcademyAwardLoaderRunner implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
-    awardLoader.loadOscarNominations();
+//    awardLoader.loadOscarNominations();
   }
 }

@@ -1,8 +1,6 @@
 package com.skthvl.cinemetrics.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,14 +18,12 @@ import lombok.ToString;
 public class DataFileMigration extends Auditable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false, updatable = false)
-  private BigInteger id;
+  @Column(name = "id", nullable = false)
+  private Integer id;
 
-  @Column(nullable = false)
-  @NotBlank
-  private String name;
+  @Column(nullable = false, unique = true)
+  private String filePath;
 
-  @Column(nullable = false)
-  @NotBlank
+  @Column(name = "file_checksum", nullable = false)
   private String fileChecksum;
 }

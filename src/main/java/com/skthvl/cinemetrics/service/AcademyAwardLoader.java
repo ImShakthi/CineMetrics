@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AcademyAwardLoader {
 
   private static final String BEST_PICTURE = "BEST PICTURE";
-  private static final String ACADEMY_AWARDS_CSV_FILE = "ACADEMY_AWARDS_CSV_FILE";
 
   private final MovieRepository movieRepository;
   private final NominationRepository nominationRepository;
@@ -42,9 +41,10 @@ public class AcademyAwardLoader {
   public void loadOscarNominations() {
 
     if (hasDataAlreadyMigrated()) {
-      log.warn("Academy Awards data has already been migrated");
+      log.info("Academy Awards data has already been migrated");
       return;
     }
+    log.info("MIGRATION needed :: Academy Awards data");
 
     try (var reader = getCsvReader()) {
       final List<Nomination> nominations =
@@ -60,25 +60,22 @@ public class AcademyAwardLoader {
       nominationRepository.saveAll(nominations);
       log.info("Saved {} Oscar nominations for Best Picture", nominations.size());
 
-      dataFileMigrationRepository.save(
+      final DataFileMigration dataFileMigration =
           DataFileMigration.builder()
-              .name(ACADEMY_AWARDS_CSV_FILE)
-              .fileChecksum(calculateChecksum(csvPath, "SHA-256"))
-              .build());
+              .filePath(csvPath)
+              .fileChecksum(calculateChecksum(csvPath, "MD5"))
+              .build();
+      dataFileMigrationRepository.save(dataFileMigration);
+      log.info("Saved data file migration record for {}", dataFileMigration);
     } catch (Exception e) {
       log.error("Error loading Academy Awards data", e);
     }
   }
 
   private boolean hasDataAlreadyMigrated() {
-    return dataFileMigrationRepository.findByName(ACADEMY_AWARDS_CSV_FILE).stream()
-        .findFirst()
-        .map(
-            migration -> {
-              final String currentChecksum = calculateChecksum(csvPath, "SHA-256");
-              return currentChecksum != null && currentChecksum.equals(migration.getFileChecksum());
-            })
-        .orElse(false);
+    final String checksum = calculateChecksum(csvPath, "MD5");
+    log.info("checksum: {} for {}", checksum, csvPath);
+    return dataFileMigrationRepository.existsByFilePathAndFileChecksum(csvPath, checksum);
   }
 
   private Nomination createNomination(final String[] data) {
