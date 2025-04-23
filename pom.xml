@@ -177,6 +177,7 @@
         </dependencies>
     </dependencyManagement>
     <build>
+        <finalName>cinemetrics-app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
