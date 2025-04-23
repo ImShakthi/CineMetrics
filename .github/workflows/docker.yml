@@ -47,19 +47,10 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-#      - name: 🏗️ Build and push
-#        uses: docker/build-push-action@v6
-#        with:
-#          context: .
-#          push: ${{ github.event_name != 'pull_request' }}
-#          tags: ${{ steps.meta.outputs.tags }}
-#          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: 🏗️ Build Docker image with Compose
-        run: docker-compose build
-
-      - name: Build Docker image
-        run: docker build -t imshakthi/cinemetrics-api:latest .
-
-      - name: Push Docker image
-        run: docker push imshakthi/cinemetrics-api:latest
+      - name: 🏗️ Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
