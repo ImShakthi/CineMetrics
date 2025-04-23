@@ -7,7 +7,6 @@ import com.skthvl.cinemetrics.entity.Movie;
 import com.skthvl.cinemetrics.entity.Nomination;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.NominationRepository;
-import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
@@ -30,8 +30,8 @@ public class AcademyAwardLoader {
   @Value("${cinemetrics.data.csv.academy-award-path}")
   private String csvPath;
 
-  @PostConstruct
-  public void execute() {
+  @Transactional
+  public void loadOscarNominations() {
     try (var reader = getCsvReader()) {
       final List<Nomination> nominations =
           reader

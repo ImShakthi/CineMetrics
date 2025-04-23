@@ -60,7 +60,7 @@ class AcademyAwardLoaderTest {
     when(movieRepository.save(any(Movie.class))).thenReturn(mockMovie2);
 
     // When
-    testLoader.execute();
+    testLoader.loadOscarNominations();
 
     // Then
     ArgumentCaptor<List<Nomination>> captor = ArgumentCaptor.forClass(List.class);
