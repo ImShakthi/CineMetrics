@@ -15,7 +15,7 @@ public class AuthService {
     this.jwtTokenProvider = jwtTokenProvider;
   }
 
-  public String validateUser(final UserDto userDto) {
+  public String authenticateAndGenerateToken(final UserDto userDto) {
     if (userAccountService.isUserCredentialValid(userDto)) {
       return jwtTokenProvider.generateToken(userDto.userName());
     }

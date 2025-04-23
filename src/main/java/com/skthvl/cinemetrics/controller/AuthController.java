@@ -36,7 +36,7 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@RequestBody @Valid final LoginRequest request) {
     final var token =
-        authService.validateUser(new UserDto(request.getUsername(), request.getPassword()));
+        authService.authenticateAndGenerateToken(new UserDto(request.getUsername(), request.getPassword()));
     log.info("Login token generated: {}", token);
 
     return ResponseEntity.ok(new LoginResponse(token));
