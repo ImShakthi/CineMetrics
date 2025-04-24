@@ -63,6 +63,7 @@ public class AcademyAwardLoader {
               .filePath(csvPath)
               .fileChecksum(calculateChecksum(csvPath, "MD5"))
               .build();
+
       dataFileMigrationRepository.save(dataFileMigration);
       log.info("Saved data file migration record for {}", dataFileMigration);
     } catch (Exception e) {

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DataFileMigrationRepository extends JpaRepository<DataFileMigration, Integer> {
 
-  boolean existsByFilePathAndFileChecksum(String filePath, String fileChecksum);
+  boolean existsByFilePathAndFileChecksum(final String filePath, final String fileChecksum);
 }
