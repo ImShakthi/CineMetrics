@@ -4,6 +4,7 @@ import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTit
 import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitleAndYear;
 import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitleAndYearByBoxOffice;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.*;
@@ -255,7 +256,7 @@ class CineMetricsApplicationTests {
           .post()
           .then()
           .statusCode(200)
-          .body("message", equalTo("rating created successfully"));
+          .body("message", containsString("added rating to movie:"));
     }
 
     private void assertGetAwardMovieDetails(final String title) {

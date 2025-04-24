@@ -5,6 +5,7 @@ import com.skthvl.cinemetrics.entity.Rating;
 import com.skthvl.cinemetrics.exception.DuplicateRatingException;
 import com.skthvl.cinemetrics.exception.MovieNotFoundException;
 import com.skthvl.cinemetrics.exception.UserDoesNotExistException;
+import com.skthvl.cinemetrics.mapper.RatingMapper;
 import com.skthvl.cinemetrics.model.dto.AddRatingDto;
 import com.skthvl.cinemetrics.model.dto.RatingDto;
 import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
@@ -25,16 +26,19 @@ public class RatingService {
   private final UserAccountRepository userAccountRepository;
   private final MovieRepository movieRepository;
   private final OmdbApiClient omdbApiClient;
+  private final RatingMapper ratingMapper;
 
   public RatingService(
       final RatingRepository ratingRepository,
       final UserAccountRepository userAccountRepository,
       final MovieRepository movieRepository,
-      final OmdbApiClient omdbApiClient) {
+      final OmdbApiClient omdbApiClient,
+      final RatingMapper ratingMapper) {
     this.ratingRepository = ratingRepository;
     this.userAccountRepository = userAccountRepository;
     this.movieRepository = movieRepository;
     this.omdbApiClient = omdbApiClient;
+    this.ratingMapper = ratingMapper;
   }
 
   @Transactional(readOnly = true)
@@ -43,7 +47,7 @@ public class RatingService {
   }
 
   @Transactional
-  public void addRating(final AddRatingDto ratingDto) {
+  public RatingDto addRating(final AddRatingDto ratingDto) {
     final var userAccount =
         userAccountRepository
             .findByName(ratingDto.userName())
@@ -74,6 +78,8 @@ public class RatingService {
     try {
       ratingRepository.save(rating);
       log.info("added rating for movie {} by user {}", movie.getTitle(), ratingDto.userName());
+
+      return ratingMapper.toRatingDto(rating);
     } catch (DataIntegrityViolationException ex) {
       log.error("error adding rating {}", ex.getMessage());
       throw new DuplicateRatingException();

@@ -1,5 +1,6 @@
 package com.skthvl.cinemetrics.mapper;
 
+import com.skthvl.cinemetrics.entity.Rating;
 import com.skthvl.cinemetrics.model.dto.RatingDto;
 import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
 import com.skthvl.cinemetrics.model.response.RatingResponse;
@@ -36,4 +37,10 @@ public interface RatingMapper {
 
   List<TopRatedMovieResponse> toTopRatedMovieResponse(
       final List<TopRatedMovieDto> topRatedMovieDtos);
+
+  @Mapping(target = "rating", source = "rating")
+  @Mapping(target = "movieTitle", source = "rating.movie.title")
+  @Mapping(target = "userName", source = "rating.ratedBy.name")
+  @Mapping(target = "comment", ignore = true)
+  RatingDto toRatingDto(final Rating rating);
 }

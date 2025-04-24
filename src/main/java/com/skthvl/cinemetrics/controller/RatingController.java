@@ -49,6 +49,10 @@ public class RatingController {
           final String movieId,
       @RequestBody @Valid final CreateRatingRequest request) {
 
+    if (authentication == null) {
+      return ResponseEntity.status(401).body(new MessageResponse("authentication is required"));
+    }
+
     final var userName = authentication.getName();
     log.info("User name: {}", userName);
 
@@ -60,9 +64,10 @@ public class RatingController {
             .userName(userName)
             .build();
 
-    ratingService.addRating(rating);
+    final var ratingDto = ratingService.addRating(rating);
 
-    return ResponseEntity.ok(new MessageResponse("rating created successfully"));
+    return ResponseEntity.ok(
+        new MessageResponse("added rating to movie: " + ratingDto.getMovieTitle()));
   }
 
   @GetMapping("/ratings/top")

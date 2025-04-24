@@ -1,9 +1,9 @@
 package com.skthvl.cinemetrics.controller;
 
-import com.skthvl.cinemetrics.client.omdb.OmdbApiClient;
 import com.skthvl.cinemetrics.mapper.MovieMapper;
 import com.skthvl.cinemetrics.model.response.MovieAwardInfoResponse;
 import com.skthvl.cinemetrics.model.response.MovieInfoResponse;
+import com.skthvl.cinemetrics.service.MovieService;
 import com.skthvl.cinemetrics.service.NominationInfoService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -17,23 +17,23 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class MovieController {
 
-  private final OmdbApiClient omdbApiClient;
-  private final MovieMapper movieMapper;
+  private final MovieService movieService;
   private final NominationInfoService nominationInfoService;
+  private final MovieMapper movieMapper;
 
   public MovieController(
-      final OmdbApiClient omdbApiClient,
-      final MovieMapper movieMapper,
-      final NominationInfoService movieInfoService) {
-    this.omdbApiClient = omdbApiClient;
-    this.movieMapper = movieMapper;
+          final MovieService movieService, final MovieMapper movieMapper,
+          final NominationInfoService movieInfoService) {
+      this.movieService = movieService;
+      this.movieMapper = movieMapper;
     this.nominationInfoService = movieInfoService;
   }
 
+  //TODO: get movieid
   @GetMapping("/search")
   public ResponseEntity<MovieInfoResponse> getMovieDetailsByTitle(
       @RequestParam(value = "title") final String title) {
-    final var movieDetails = omdbApiClient.getMoveDetailsByTitle(title);
+    final var movieDetails = movieService.getMovieInfoByTitle(title);
 
     log.info("Movie Details: {}", movieDetails);
 

@@ -1,6 +1,7 @@
-package com.skthvl.cinemetrics.model.response;
+package com.skthvl.cinemetrics.model.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovieInfoResponse {
+@Builder
+public class MovieDto {
   private String movieId;
   private String title;
   private String year;

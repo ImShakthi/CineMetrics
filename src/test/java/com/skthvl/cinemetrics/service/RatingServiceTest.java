@@ -14,6 +14,7 @@ import com.skthvl.cinemetrics.entity.UserAccount;
 import com.skthvl.cinemetrics.exception.DuplicateRatingException;
 import com.skthvl.cinemetrics.exception.MovieNotFoundException;
 import com.skthvl.cinemetrics.exception.UserDoesNotExistException;
+import com.skthvl.cinemetrics.mapper.RatingMapper;
 import com.skthvl.cinemetrics.model.dto.AddRatingDto;
 import com.skthvl.cinemetrics.model.dto.RatingDto;
 import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
@@ -38,13 +39,15 @@ class RatingServiceTest {
   @Mock private UserAccountRepository userAccountRepository;
   @Mock private MovieRepository movieRepository;
   @Mock private OmdbApiClient omdbApiClient;
+  @Mock private RatingMapper ratingMapper;
 
   private RatingService ratingService;
 
   @BeforeEach
   void setUp() {
     ratingService =
-        new RatingService(ratingRepository, userAccountRepository, movieRepository, omdbApiClient);
+        new RatingService(
+            ratingRepository, userAccountRepository, movieRepository, omdbApiClient, ratingMapper);
   }
 
   @Test

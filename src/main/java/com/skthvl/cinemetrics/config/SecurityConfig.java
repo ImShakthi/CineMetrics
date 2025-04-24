@@ -79,7 +79,7 @@ public class SecurityConfig {
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
                     .permitAll()
-                    //                    .hasRole("ADMIN")
+                    //.hasRole("ADMIN")
 
                     // Other APIs
                     .anyRequest()
