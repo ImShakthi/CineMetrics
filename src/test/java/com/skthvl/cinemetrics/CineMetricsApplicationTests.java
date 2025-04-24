@@ -88,51 +88,6 @@ class CineMetricsApplicationTests {
   @Test
   void contextLoads() {}
 
-  private String getToken(String username, String password) {
-    String json = "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(username, password);
-    return given()
-        .basePath("/api/v1/login")
-        .contentType(ContentType.JSON)
-        .body(json)
-        .when()
-        .post()
-        .then()
-        .extract()
-        .path("token");
-  }
-
-  private void assertLogout(String token) {
-    given()
-        .header("Authorization", "Bearer " + token)
-        .basePath("/api/v1/logout")
-        .when()
-        .post()
-        .then()
-        .statusCode(200);
-  }
-
-  private void assertDeleteUser(String json) {
-    given()
-        .basePath("/api/v1/users")
-        .contentType(ContentType.JSON)
-        .body(json)
-        .when()
-        .delete()
-        .then()
-        .statusCode(200)
-        .body("message", equalTo("user deleted successfully"));
-  }
-
-  private void assertUserExists(final String username) {
-    var user = userAccountRepository.findByName(username);
-    assertTrue(user.isPresent());
-  }
-
-  private void assertUserDoesntExist(final String username) {
-    var user = userAccountRepository.findByName(username);
-    assertTrue(user.isEmpty());
-  }
-
   @Nested
   class UserLifecycleTests {
 
@@ -195,6 +150,51 @@ class CineMetricsApplicationTests {
       assertTopRated(token);
     }
 
+    private String getToken(String username, String password) {
+      String json = "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(username, password);
+      return given()
+          .basePath("/api/v1/login")
+          .contentType(ContentType.JSON)
+          .body(json)
+          .when()
+          .post()
+          .then()
+          .extract()
+          .path("token");
+    }
+
+    private void assertLogout(String token) {
+      given()
+          .header("Authorization", "Bearer " + token)
+          .basePath("/api/v1/logout")
+          .when()
+          .post()
+          .then()
+          .statusCode(200);
+    }
+
+    private void assertDeleteUser(String json) {
+      given()
+          .basePath("/api/v1/users")
+          .contentType(ContentType.JSON)
+          .body(json)
+          .when()
+          .delete()
+          .then()
+          .statusCode(200)
+          .body("message", equalTo("user deleted successfully"));
+    }
+
+    private void assertUserExists(final String username) {
+      var user = userAccountRepository.findByName(username);
+      assertTrue(user.isPresent());
+    }
+
+    private void assertUserDoesntExist(final String username) {
+      var user = userAccountRepository.findByName(username);
+      assertTrue(user.isEmpty());
+    }
+
     private void assertCreateUser(String json, String token) {
       given()
           .header("Authorization", "Bearer " + token)
@@ -212,6 +212,7 @@ class CineMetricsApplicationTests {
       given()
           .header("Authorization", "Bearer " + token)
           .basePath("/api/v1/ratings/top")
+          .queryParam("limit", 10)
           .when()
           .get()
           .then()
