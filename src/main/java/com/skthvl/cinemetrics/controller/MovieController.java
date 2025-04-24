@@ -54,6 +54,6 @@ public class MovieController {
   }
 
   private String getCategory(final String category) {
-    return (category == null) ? "best picture" : category;
+    return (category == null) ? "best picture" : category.toLowerCase();
   }
 }
