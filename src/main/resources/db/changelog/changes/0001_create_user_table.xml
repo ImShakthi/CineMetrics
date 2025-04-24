@@ -23,5 +23,10 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <insert tableName="user_account">
+            <column name="name">admin</column>
+            <column name="password_hash">$2a$10$VCLsbE5ST5d/OtCRbXEVZuDZvnT9gj9Z3MRINuU8yaGXBP9/5LeDa</column>
+        </insert>
     </changeSet>
 </databaseChangeLog>

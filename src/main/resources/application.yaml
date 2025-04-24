@@ -8,7 +8,7 @@ spring:
     type: redis
   data:
     redis:
-      host: ${SPRING_REDIS_HOST:localhost}
+      host: ${SPRING_REDIS_HOST}
       port: ${SPRING_REDIS_PORT}
       username: ${SPRING_REDIS_USERNAME}
       password: ${SPRING_REDIS_PASSWORD}

@@ -5,7 +5,6 @@ import com.skthvl.cinemetrics.mapper.MovieMapper;
 import com.skthvl.cinemetrics.model.response.MovieAwardInfoResponse;
 import com.skthvl.cinemetrics.model.response.MovieInfoResponse;
 import com.skthvl.cinemetrics.service.NominationInfoService;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +30,9 @@ public class MovieController {
     this.nominationInfoService = movieInfoService;
   }
 
-  @GetMapping("/{title}")
+  @GetMapping("/search")
   public ResponseEntity<MovieInfoResponse> getMovieDetailsByTitle(
-      @PathVariable @NotBlank(message = "title must not be empty") final String title) {
+      @RequestParam(value = "title") final String title) {
     final var movieDetails = omdbApiClient.getMoveDetailsByTitle(title);
 
     log.info("Movie Details: {}", movieDetails);

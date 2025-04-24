@@ -15,16 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/ratings")
+@RequestMapping("/api/v1")
 @Validated
 public class RatingController {
 
@@ -36,25 +31,29 @@ public class RatingController {
     this.ratingMapper = ratingMapper;
   }
 
-  @GetMapping("/{title}")
+  @GetMapping("/movies/{title}/ratings")
   public ResponseEntity<List<RatingResponse>> getRatings(
-      @PathVariable @NotBlank(message = "title must not be empty") final String title) {
+      @PathVariable(name = "title") @NotBlank(message = "title must not be empty")
+          final String title) {
     final var ratingDto = ratingService.getRatingInfo(title);
 
     return ResponseEntity.ok(ratingMapper.toRatingResponse(ratingDto));
   }
 
   @SecurityRequirement(name = "bearerAuth")
-  @PostMapping()
+  @PostMapping("/movies/{movieId}/ratings")
   public ResponseEntity<MessageResponse> createRating(
-      final Authentication authentication, @RequestBody @Valid final CreateRatingRequest request) {
+      final Authentication authentication,
+      @PathVariable(name = "movieId") @NotBlank(message = "title must not be empty")
+          final String movieId,
+      @RequestBody @Valid final CreateRatingRequest request) {
 
     final var userName = authentication.getName();
     log.info("User name: {}", userName);
 
     final AddRatingDto rating =
         AddRatingDto.builder()
-            .movieId(request.getMovieId())
+            .movieId(Long.valueOf(movieId))
             .rating(request.getRating())
             .comment(request.getComment())
             .userName(userName)
@@ -65,10 +64,12 @@ public class RatingController {
     return ResponseEntity.ok(new MessageResponse("rating created successfully"));
   }
 
-  @GetMapping("/top-10")
-  public ResponseEntity<List<TopRatedMovieResponse>> getTop10Ratings() {
-
-    final var topRatedMovies = ratingService.getTop10RatedMovies();
+  @GetMapping("/ratings/top")
+  public ResponseEntity<List<TopRatedMovieResponse>> getTop10Ratings(
+      @RequestParam(name = "limit") final int limit) {
+    log.info("Getting top 10 rated movies");
+    final var topRatedMovies = ratingService.getTopRatedMovies(limit);
+    log.info("Top 10 rated movies: {}", topRatedMovies);
 
     return ResponseEntity.ok(ratingMapper.toTopRatedMovieResponse(topRatedMovies));
   }

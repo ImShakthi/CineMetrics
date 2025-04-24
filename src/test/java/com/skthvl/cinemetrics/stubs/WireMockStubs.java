@@ -51,4 +51,28 @@ public class WireMockStubs {
                                     """
                             .formatted(title, year))));
   }
+
+  public static void stubGetMoveDetailsByTitleAndYearAndBoxOffice(
+      final String title, final String year, final String boxOffice) {
+    stubFor(
+        get(urlPathEqualTo("/"))
+            .withQueryParam("apikey", equalTo("test-api-key"))
+            .withQueryParam("t", equalTo(title))
+            .withQueryParam("y", equalTo(year))
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(
+                        """
+                                                          {
+                                                            "Title": "%s",
+                                                            "Year": "%s",
+                                                            "Rated": "PG-13",
+                                                            "Released": "16 Jul 2010",
+                                                            "Runtime": "148 min",
+                                                            "BoxOffice": "$%s"
+                                                          }
+                                                        """
+                            .formatted(title, year, boxOffice))));
+  }
 }

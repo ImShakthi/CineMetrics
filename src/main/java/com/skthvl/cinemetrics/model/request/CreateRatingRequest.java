@@ -12,11 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateRatingRequest {
-  @NotBlank(message = "rating must not be empty")
+  @NotNull(message = "rating must not be empty")
   private Integer rating;
-
-  @NotNull(message = "movieId must not be empty")
-  private Long movieId;
 
   @NotBlank(message = "comment must not be empty")
   private String comment;

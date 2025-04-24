@@ -56,6 +56,7 @@ public class UserAccountService {
   }
 
   private UserAccount validateCredentials(final UserDto userDto) {
+    log.info(">>>> user name: {}", userDto.userName());
     final var userAccount =
         userAccountRepository
             .findByName(userDto.userName())

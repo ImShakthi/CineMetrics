@@ -2,6 +2,7 @@ package com.skthvl.cinemetrics.service;
 
 import static com.skthvl.cinemetrics.util.DateUtil.parseYearAndEdition;
 import static com.skthvl.cinemetrics.util.FileUtil.calculateChecksum;
+import static java.util.Objects.requireNonNull;
 
 import com.skthvl.cinemetrics.entity.DataFileMigration;
 import com.skthvl.cinemetrics.entity.Movie;
@@ -10,11 +11,8 @@ import com.skthvl.cinemetrics.repository.DataFileMigrationRepository;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.NominationRepository;
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -115,10 +113,11 @@ public class AcademyAwardLoader {
     }
   }
 
-  private BufferedReader getCsvReader() throws URISyntaxException, IOException {
+  private BufferedReader getCsvReader() {
     log.debug("Loading Academy Awards CSV from {}", csvPath);
-    final Path path = Path.of(ClassLoader.getSystemResource(csvPath).toURI());
-    return Files.newBufferedReader(path);
+    return new BufferedReader(
+        new InputStreamReader(
+            requireNonNull(getClass().getClassLoader().getResourceAsStream(csvPath))));
   }
 
   private Movie findOrCreateMovie(final String title, final int year) {

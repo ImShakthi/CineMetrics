@@ -5,12 +5,16 @@ import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTit
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.skthvl.cinemetrics.entity.UserAccount;
+import com.skthvl.cinemetrics.repository.RatingRepository;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,6 +43,7 @@ class CineMetricsApplicationTests {
 
   @LocalServerPort private Integer port;
   @Autowired private UserAccountRepository userAccountRepository;
+  @Autowired private RatingRepository ratingRepository;
 
   @BeforeAll
   static void beforeAll() {
@@ -64,6 +69,9 @@ class CineMetricsApplicationTests {
   @BeforeEach
   void backEach() {
     RestAssured.baseURI = "http://localhost:" + port;
+
+    userAccountRepository.deleteAll();
+    ratingRepository.deleteAll();
   }
 
   @Test
@@ -71,33 +79,39 @@ class CineMetricsApplicationTests {
 
   @Test
   void addAndDeleteUser() {
+    userAccountRepository.save(
+        UserAccount.builder()
+            .name("admin")
+            .passwordHash("$2a$10$VCLsbE5ST5d/OtCRbXEVZuDZvnT9gj9Z3MRINuU8yaGXBP9/5LeDa")
+            .build());
+
+    final String adminToken = getAdminToken();
+    log.info("token: {}", adminToken);
+
     final var userName = "test_user_1";
     final String jsonBody =
         """
-          {"username":"%s","password":"password123"}
-          """
+        {"username":"%s","password":"password123"}
+        """
             .formatted(userName);
 
-    // create table
-    userAccountRepository.deleteAll();
-
-    // user not created yet
+    // check user not don't exist
     assertUserDoesntExist(userName);
 
     // create user
-    assertCreateUser(jsonBody);
+    assertCreateUser(jsonBody, adminToken);
 
-    // check user created
+    // check user exists
     assertUserExists(userName);
 
     // login and fetch token
-    final String token = getToken(jsonBody);
-    log.info("token: {}", token);
+    final String userToken = getToken(jsonBody);
+    log.info("token: {}", userToken);
 
     // delete user
     assertDeleteUser(jsonBody);
 
-    // check after user deleted
+    // check user doesn't exists deleted
     assertUserDoesntExist(userName);
   }
 
@@ -110,10 +124,15 @@ class CineMetricsApplicationTests {
 
     // get movie award details
     assertGetAwardMovieDetails(title);
+
+    final var response = getRatingsForMovieBy(title);
+    assertNotNull(response);
+    assertEquals("", response.jsonPath());
   }
 
-  private void assertCreateUser(final String createUserJsonBody) {
+  private void assertCreateUser(final String createUserJsonBody, String adminToken) {
     given()
+        .header("Authorization", "Bearer " + adminToken)
         .basePath("/api/v1/users")
         .contentType(ContentType.JSON)
         .body(createUserJsonBody)
@@ -122,6 +141,14 @@ class CineMetricsApplicationTests {
         .then()
         .statusCode(201)
         .body("message", equalTo("user created successfully"));
+  }
+
+  private String getAdminToken() {
+    final var jsonBody =
+        """
+        {"username":"admin","password":"admin123"}
+      """;
+    return getToken(jsonBody);
   }
 
   private String getToken(final String loginRequestJsonBody) {
@@ -169,8 +196,8 @@ class CineMetricsApplicationTests {
     stubGetMoveDetailsByTitle(title);
 
     given()
-        .basePath("/api/v1/movies/{title}")
-        .pathParam("title", title)
+        .basePath("/api/v1/movies/search")
+        .queryParam("title", title)
         .accept(ContentType.JSON)
         .when()
         .get()
@@ -193,5 +220,20 @@ class CineMetricsApplicationTests {
         .statusCode(200)
         .body("releaseYear", hasItems(1994))
         .body("hasWon", hasItems(true));
+  }
+
+  private Response getRatingsForMovieBy(final String title) {
+    stubGetMoveDetailsByTitle(title);
+
+    return given()
+        .basePath("/api/v1/movies/{title}/ratings")
+        .pathParam("title", title)
+        .accept(ContentType.JSON)
+        .when()
+        .get()
+        .then()
+        .statusCode(200)
+        .extract()
+        .response();
   }
 }

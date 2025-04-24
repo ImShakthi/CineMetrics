@@ -1,5 +1,6 @@
 package com.skthvl.cinemetrics.provider;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -7,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +40,24 @@ public class JwtTokenProvider {
 
   // generate JWT token
   public String generateToken(final String subject) {
-    return generateToken(subject, new Date(System.currentTimeMillis()));
+    return generateToken(subject, new Date(System.currentTimeMillis()), List.of("ROLE_USER"));
   }
 
   public String generateToken(final String subject, final Date currentDate) {
+    return generateToken(subject, currentDate, List.of("ROLE_USER"));
+  }
+
+  public String generateTokenWithRoles(final String subject, final List<String> roles) {
+    return generateToken(subject, new Date(System.currentTimeMillis()), roles);
+  }
+
+  public String generateToken(
+      final String subject, final Date currentDate, final List<String> roles) {
     final Date expireDate = new Date(currentDate.getTime() + jwtExpirationInMilliseconds);
 
     return Jwts.builder()
         .subject(subject)
+        .claim("roles", roles)
         .issuedAt(currentDate)
         .expiration(expireDate)
         .id(UUID.randomUUID().toString())
@@ -60,6 +72,14 @@ public class JwtTokenProvider {
         .parseSignedClaims(token)
         .getPayload()
         .getSubject();
+  }
+
+  public Claims extractClaims(final String token) {
+    return Jwts.parser()
+        .verifyWith((SecretKey) key())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
   }
 
   public String extractJtiId(final String token) {

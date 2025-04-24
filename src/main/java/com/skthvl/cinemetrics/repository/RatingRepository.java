@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -32,8 +33,8 @@ public interface RatingRepository extends JpaRepository<Rating, BigInteger> {
           JOIN movie m ON m.id = r.movie_id
           GROUP BY m.id, m.title, m.box_office_amount_usd
           ORDER BY m.box_office_amount_usd DESC
-          LIMIT 10
+          LIMIT :limit
           """,
       nativeQuery = true)
-  List<TopRatedMovieDto> getTop10RatedMoviesOrderByBoxOffice();
+  List<TopRatedMovieDto> getTopRatedMoviesOrderByBoxOffice(@Param("limit") final int limit);
 }

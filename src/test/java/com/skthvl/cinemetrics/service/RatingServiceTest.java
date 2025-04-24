@@ -126,13 +126,13 @@ class RatingServiceTest {
             new TopRatedMovieDto("Inception", 95.9, BigInteger.valueOf(800000000)),
             new TopRatedMovieDto("Interstellar", 94.8, BigInteger.valueOf(700000000)));
 
-    when(ratingRepository.getTop10RatedMoviesOrderByBoxOffice()).thenReturn(mockTop10);
+    when(ratingRepository.getTopRatedMoviesOrderByBoxOffice(10)).thenReturn(mockTop10);
 
     // When
-    final List<TopRatedMovieDto> result = ratingService.getTop10RatedMovies();
+    final List<TopRatedMovieDto> result = ratingService.getTopRatedMovies(10);
 
     // Then
     assertEquals(mockTop10, result);
-    verify(ratingRepository).getTop10RatedMoviesOrderByBoxOffice();
+    verify(ratingRepository).getTopRatedMoviesOrderByBoxOffice(10);
   }
 }

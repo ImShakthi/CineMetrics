@@ -81,7 +81,7 @@ public class RatingService {
   }
 
   @Transactional(readOnly = true)
-  public List<TopRatedMovieDto> getTop10RatedMovies() {
-    return ratingRepository.getTop10RatedMoviesOrderByBoxOffice();
+  public List<TopRatedMovieDto> getTopRatedMovies(final int limit) {
+    return ratingRepository.getTopRatedMoviesOrderByBoxOffice(limit);
   }
 }

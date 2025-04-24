@@ -42,11 +42,18 @@ public class SecurityConfig {
 
   private static final String[] PUBLIC_APP_APIs =
       new String[] {
-        "/api/v1/users", "/api/v1/movies/{title}", "/api/v1/movies/{title}/oscar", "/api/v1/login"
+        "/api/v1/movies/search", "/api/v1/movies/{title}/oscar", "/api/v1/login"
       };
 
   private static final String[] AUTH_APP_APIs =
-      new String[] {"/api/v1/ratings", "/api/v1/ratings/{title}", "/api/v1/ratings/top-10","/api/v1/logout"};
+      new String[] {
+        "/api/v1/movies/{title}/ratings",
+        "/api/v1/movies/{movieId}/ratings",
+        "/api/v1/ratings/top/**",
+        "/api/v1/logout"
+      };
+
+  private static final String[] ADMIN_AUTH_APP_APIs = new String[] {"/api/v1/users"};
 
   private final JwtAuthenticationFilter jwtFilter;
 
@@ -70,6 +77,11 @@ public class SecurityConfig {
                     // auth apis (with JWT)
                     .requestMatchers(AUTH_APP_APIs)
                     .authenticated()
+
+                    // admin apis (with JWT)
+                    .requestMatchers(ADMIN_AUTH_APP_APIs)
+                    .permitAll()
+//                    .hasRole("ADMIN")
 
                     // Other APIs
                     .anyRequest()
