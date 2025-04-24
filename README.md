@@ -9,7 +9,18 @@ This service integrates with the OMDb API and a provided CSV file to fetch and s
 - List the top **N** highest-rated movies, ranked by box office revenue
 - Create and delete user accounts, with JWT based authentication
 
-## Techstack
+---
+## 📌 Resources
+- [Solution](https://github.com/ImShakthi/CineMetrics/blob/main/docs/solution.md)
+- [How to run?](https://github.com/ImShakthi/CineMetrics/blob/main/docs/how_to_run.md)
+- [How to test?](https://github.com/ImShakthi/CineMetrics/blob/main/docs/how_to_test.md)
+- [TODOs](https://github.com/ImShakthi/CineMetrics/blob/main/docs/to_do.md)
+- [How to scale?](https://github.com/ImShakthi/CineMetrics/blob/main/docs/scale.md)
+- [Assumptions](https://github.com/ImShakthi/CineMetrics/blob/main/docs/assumptions.md)
+
+---
+
+## Techstack used👾
 - Java 21
 - Spring Boot 3
 - Maven 3.9
