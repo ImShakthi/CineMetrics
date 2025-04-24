@@ -108,7 +108,7 @@ class CineMetricsApplicationTests {
       assertLogout(userToken);
       assertUnauthorizedAccess(userToken);
 
-      assertDeleteUser(userJson);
+      assertDeleteUser(adminToken, userJson);
       assertUserDoesntExist(userName);
     }
 
@@ -174,8 +174,9 @@ class CineMetricsApplicationTests {
           .statusCode(200);
     }
 
-    private void assertDeleteUser(String json) {
+    private void assertDeleteUser(final String token, final String json) {
       given()
+          .header("Authorization", "Bearer " + token)
           .basePath("/api/v1/users")
           .contentType(ContentType.JSON)
           .body(json)
