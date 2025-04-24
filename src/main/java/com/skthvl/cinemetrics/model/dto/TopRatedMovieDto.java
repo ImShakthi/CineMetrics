@@ -1,6 +1,6 @@
 package com.skthvl.cinemetrics.model.dto;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import lombok.Setter;
 public class TopRatedMovieDto {
   private String title;
 
-  private double averageRating;
+  private BigDecimal averageRating;
 
-  private BigInteger boxOfficeAmountUsd;
+  private Long boxOfficeAmountUsd;
 }

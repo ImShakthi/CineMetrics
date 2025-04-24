@@ -17,7 +17,6 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ErrorResponse> handleIllegalArgument(final IllegalArgumentException ex) {
-    ex.printStackTrace();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
   }
 
@@ -32,7 +31,6 @@ public class GlobalExceptionHandler {
             error -> {
               errors.put(error.getField(), error.getDefaultMessage());
             });
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
   }
 
@@ -48,7 +46,6 @@ public class GlobalExceptionHandler {
               String message = violation.getMessage();
               errors.put(field, message);
             });
-    ex.printStackTrace();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
   }
 
@@ -59,13 +56,11 @@ public class GlobalExceptionHandler {
     DuplicateRatingException.class
   })
   public ResponseEntity<ErrorResponse> handleBadRequest(final Exception ex) {
-    ex.printStackTrace();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
   }
 
   @ExceptionHandler({InvalidApiKeyException.class, InvalidCredentialException.class})
   public ResponseEntity<ErrorResponse> handleInvalidApiKeyException(final Exception ex) {
-    ex.printStackTrace();
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
   }
 

@@ -35,6 +35,7 @@ public class RatingController {
   public ResponseEntity<List<RatingResponse>> getRatings(
       @PathVariable(name = "title") @NotBlank(message = "title must not be empty")
           final String title) {
+    log.info("Getting ratings for movie: {}", title);
     final var ratingDto = ratingService.getRatingInfo(title);
 
     return ResponseEntity.ok(ratingMapper.toRatingResponse(ratingDto));

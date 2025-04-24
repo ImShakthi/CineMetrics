@@ -1,11 +1,12 @@
 package com.skthvl.cinemetrics.model.response;
 
-import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,6 +15,6 @@ import lombok.Setter;
 @Builder
 public class TopRatedMovieResponse {
   private String title;
-  private double averageRating;
-  private BigInteger boxOfficeValue;
+  private BigDecimal averageRating;
+  private Long boxOfficeValue;
 }

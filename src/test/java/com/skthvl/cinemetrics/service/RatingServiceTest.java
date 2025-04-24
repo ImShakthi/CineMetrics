@@ -20,6 +20,7 @@ import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
 import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.RatingRepository;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -123,8 +124,8 @@ class RatingServiceTest {
     // Given
     List<TopRatedMovieDto> mockTop10 =
         List.of(
-            new TopRatedMovieDto("Inception", 95.9, BigInteger.valueOf(800000000)),
-            new TopRatedMovieDto("Interstellar", 94.8, BigInteger.valueOf(700000000)));
+            new TopRatedMovieDto("Inception", BigDecimal.valueOf(95.9), 800000000L),
+            new TopRatedMovieDto("Interstellar", BigDecimal.valueOf(94.8), 700000000L));
 
     when(ratingRepository.getTopRatedMoviesOrderByBoxOffice(10)).thenReturn(mockTop10);
 

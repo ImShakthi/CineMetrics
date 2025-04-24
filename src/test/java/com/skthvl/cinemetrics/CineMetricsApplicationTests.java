@@ -2,12 +2,13 @@ package com.skthvl.cinemetrics;
 
 import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitle;
 import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitleAndYear;
+import static com.skthvl.cinemetrics.stubs.WireMockStubs.stubGetMoveDetailsByTitleAndYearByBoxOffice;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.skthvl.cinemetrics.entity.UserAccount;
 import com.skthvl.cinemetrics.repository.RatingRepository;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,105 +76,45 @@ class CineMetricsApplicationTests {
     ratingRepository.deleteAll();
   }
 
+  private final String userName = "test_user_1";
+  private final String password = "password123";
+  private final String userJson =
+      """
+          {"username":"%s","password":"%s"}
+      """
+          .formatted(userName, password);
+
   @Test
   void contextLoads() {}
 
-  @Test
-  void addAndDeleteUser() {
-    userAccountRepository.save(
-        UserAccount.builder()
-            .name("admin")
-            .passwordHash("$2a$10$VCLsbE5ST5d/OtCRbXEVZuDZvnT9gj9Z3MRINuU8yaGXBP9/5LeDa")
-            .build());
-
-    final String adminToken = getAdminToken();
-    log.info("token: {}", adminToken);
-
-    final var userName = "test_user_1";
-    final String jsonBody =
-        """
-        {"username":"%s","password":"password123"}
-        """
-            .formatted(userName);
-
-    // check user not don't exist
-    assertUserDoesntExist(userName);
-
-    // create user
-    assertCreateUser(jsonBody, adminToken);
-
-    // check user exists
-    assertUserExists(userName);
-
-    // login and fetch token
-    final String userToken = getToken(jsonBody);
-    log.info("token: {}", userToken);
-
-    // delete user
-    assertDeleteUser(jsonBody);
-
-    // check user doesn't exists deleted
-    assertUserDoesntExist(userName);
-  }
-
-  @Test
-  void getMovieDetailsAndCheckAwardDetails_whenMovieExists() {
-    final String title = "Forrest Gump";
-
-    // get movie details
-    assertGetMovieDetails(title);
-
-    // get movie award details
-    assertGetAwardMovieDetails(title);
-
-    final var response = getRatingsForMovieBy(title);
-    assertNotNull(response);
-    assertEquals("", response.jsonPath());
-  }
-
-  private void assertCreateUser(final String createUserJsonBody, String adminToken) {
-    given()
-        .header("Authorization", "Bearer " + adminToken)
-        .basePath("/api/v1/users")
-        .contentType(ContentType.JSON)
-        .body(createUserJsonBody)
-        .when()
-        .post()
-        .then()
-        .statusCode(201)
-        .body("message", equalTo("user created successfully"));
-  }
-
-  private String getAdminToken() {
-    final var jsonBody =
-        """
-        {"username":"admin","password":"admin123"}
-      """;
-    return getToken(jsonBody);
-  }
-
-  private String getToken(final String loginRequestJsonBody) {
+  private String getToken(String username, String password) {
+    String json = "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(username, password);
     return given()
         .basePath("/api/v1/login")
         .contentType(ContentType.JSON)
-        .accept(ContentType.JSON)
-        .body(loginRequestJsonBody)
+        .body(json)
         .when()
         .post()
         .then()
-        .statusCode(200)
         .extract()
-        .response()
-        .body()
-        .jsonPath()
-        .getString("token");
+        .path("token");
   }
 
-  private void assertDeleteUser(final String deleteUserJsonBody) {
+  private void assertLogout(String token) {
+    given()
+        .header("Authorization", "Bearer " + token)
+        .basePath("/api/v1/logout")
+        .when()
+        .post()
+        .then()
+        .statusCode(200);
+  }
+
+  private void assertDeleteUser(String json) {
     given()
         .basePath("/api/v1/users")
         .contentType(ContentType.JSON)
-        .body(deleteUserJsonBody)
+        .body(json)
         .when()
         .delete()
         .then()
@@ -180,60 +122,211 @@ class CineMetricsApplicationTests {
         .body("message", equalTo("user deleted successfully"));
   }
 
-  private void assertUserExists(final String userName) {
-    final var user = userAccountRepository.findByName(userName);
-    assertNotNull(user);
+  private void assertUserExists(final String username) {
+    var user = userAccountRepository.findByName(username);
     assertTrue(user.isPresent());
   }
 
-  private void assertUserDoesntExist(final String userName) {
-    final var user = userAccountRepository.findByName(userName);
-    assertNotNull(user);
+  private void assertUserDoesntExist(final String username) {
+    var user = userAccountRepository.findByName(username);
     assertTrue(user.isEmpty());
   }
 
-  private void assertGetMovieDetails(final String title) {
-    stubGetMoveDetailsByTitle(title);
+  @Nested
+  class UserLifecycleTests {
 
-    given()
-        .basePath("/api/v1/movies/search")
-        .queryParam("title", title)
-        .accept(ContentType.JSON)
-        .when()
-        .get()
-        .then()
-        .statusCode(200)
-        .body("title", equalTo("Forrest Gump"))
-        .body("year", equalTo("2010"))
-        .body("rated", equalTo("PG-13"))
-        .body("released", equalTo("16 Jul 2010"));
-  }
+    @Test
+    void testFullUserJourney() {
+      createAdminUser();
+      final String adminToken = getToken("admin", "admin123");
 
-  private void assertGetAwardMovieDetails(final String title) {
-    stubGetMoveDetailsByTitleAndYear(title, "1994");
-    given()
-        .basePath("/api/v1/movies/{title}/oscar")
-        .pathParam("title", title)
-        .when()
-        .get()
-        .then()
-        .statusCode(200)
-        .body("releaseYear", hasItems(1994))
-        .body("hasWon", hasItems(true));
-  }
+      assertUserDoesntExist(userName);
+      assertCreateUser(userJson, adminToken);
+      assertUserExists(userName);
 
-  private Response getRatingsForMovieBy(final String title) {
-    stubGetMoveDetailsByTitle(title);
+      final String userToken = getToken(userName, password);
+      assertMovieSearchAndAward();
+      assertRatingsLifecycle(userToken);
+      assertTopRatedLogic(userToken);
 
-    return given()
-        .basePath("/api/v1/movies/{title}/ratings")
-        .pathParam("title", title)
-        .accept(ContentType.JSON)
-        .when()
-        .get()
-        .then()
-        .statusCode(200)
-        .extract()
-        .response();
+      assertLogout(userToken);
+      assertUnauthorizedAccess(userToken);
+
+      assertDeleteUser(userJson);
+      assertUserDoesntExist(userName);
+    }
+
+    void createAdminUser() {
+      userAccountRepository.save(
+          UserAccount.builder()
+              .name("admin")
+              .passwordHash("$2a$10$VCLsbE5ST5d/OtCRbXEVZuDZvnT9gj9Z3MRINuU8yaGXBP9/5LeDa")
+              .build());
+    }
+
+    void assertMovieSearchAndAward() {
+      final String title = "Black Swan";
+      assertGetMovieDetails(title, "2010");
+      assertGetAwardMovieDetails(title);
+    }
+
+    void assertRatingsLifecycle(String token) {
+      String title = "Black Swan";
+      assertEquals("[]", getRatingsForMovieBy(title).asString());
+
+      addRating(token, 1, 85, "good movie");
+
+      var response = getRatingsForMovieBy(title);
+      assertNotNull(response);
+      assertTrue(response.asString().contains("Black Swan"));
+    }
+
+    void assertTopRatedLogic(String token) {
+      stubGetMoveDetailsByTitleAndYearByBoxOffice("The Fighter", "2010", "90000000");
+      addRating(token, 2, 85, "good movie");
+
+      stubGetMoveDetailsByTitleAndYearByBoxOffice("Inception", "2010", "60000000");
+      addRating(token, 3, 70, "ok movie");
+
+      stubGetMoveDetailsByTitleAndYearByBoxOffice("The Kids Are All Right", "2010", "85000000");
+      addRating(token, 4, 95, "awesome movie");
+
+      assertTopRated(token);
+    }
+
+    private void assertCreateUser(String json, String token) {
+      given()
+          .header("Authorization", "Bearer " + token)
+          .basePath("/api/v1/users")
+          .contentType(ContentType.JSON)
+          .body(json)
+          .when()
+          .post()
+          .then()
+          .statusCode(201)
+          .body("message", equalTo("user created successfully"));
+    }
+
+    void assertUnauthorizedAccess(String token) {
+      given()
+          .header("Authorization", "Bearer " + token)
+          .basePath("/api/v1/ratings/top")
+          .when()
+          .get()
+          .then()
+          .statusCode(401);
+    }
+
+    private void assertGetMovieDetails(final String title, final String year) {
+      stubGetMoveDetailsByTitle(title, year);
+
+      given()
+          .basePath("/api/v1/movies/search")
+          .queryParam("title", title)
+          .accept(ContentType.JSON)
+          .when()
+          .get()
+          .then()
+          .statusCode(200)
+          .body("title", equalTo(title))
+          .body("year", equalTo(year))
+          .body("rated", equalTo("PG-13"))
+          .body("released", equalTo("16 Jul 2010"));
+    }
+
+    private void addRating(
+        final String token, final int movieId, final int rating, final String comment) {
+      final var ratingJsonBody =
+          """
+          {
+              "rating": %d,
+              "comment": "%s"
+          }
+          """
+              .formatted(rating, comment);
+      given()
+          .header("Authorization", "Bearer " + token)
+          .basePath("/api/v1/movies/{movieId}/ratings")
+          .pathParam("movieId", movieId)
+          .contentType(ContentType.JSON)
+          .accept(ContentType.JSON)
+          .body(ratingJsonBody)
+          .when()
+          .post()
+          .then()
+          .statusCode(200)
+          .body("message", equalTo("rating created successfully"));
+    }
+
+    private void assertGetAwardMovieDetails(final String title) {
+      stubGetMoveDetailsByTitleAndYear(title, "2010");
+      given()
+          .basePath("/api/v1/movies/{title}/oscar")
+          .pathParam("title", title)
+          .when()
+          .get()
+          .then()
+          .statusCode(200)
+          .body("releaseYear", hasItems(2010))
+          .body("hasWon", hasItems(false));
+    }
+
+    private void assertTopRated(final String token) {
+      final var response =
+          given()
+              .header("Authorization", "Bearer " + token)
+              .basePath("/api/v1/ratings/top")
+              .queryParam("limit", 10)
+              .accept(ContentType.JSON)
+              .when()
+              .get()
+              .then()
+              .extract()
+              .response();
+
+      assertNotNull(response);
+      assertEquals(200, response.getStatusCode());
+      assertEquals(getExpectedTopRatedJson(), response.prettyPrint());
+    }
+
+    private Response getRatingsForMovieBy(final String title) {
+      stubGetMoveDetailsByTitle(title, "2010");
+
+      return given()
+          .basePath("/api/v1/movies/{title}/ratings")
+          .pathParam("title", title)
+          .when()
+          .get()
+          .then()
+          .statusCode(200)
+          .extract()
+          .response();
+    }
+
+    private String getExpectedTopRatedJson() {
+      return """
+        [
+            {
+                "title": "Black Swan",
+                "averageRating": 85.00,
+                "boxOfficeValue": 292587330
+            },
+            {
+                "title": "The Fighter",
+                "averageRating": 85.00,
+                "boxOfficeValue": 90000000
+            },
+            {
+                "title": "The Kids Are All Right",
+                "averageRating": 95.00,
+                "boxOfficeValue": 85000000
+            },
+            {
+                "title": "Inception",
+                "averageRating": 70.00,
+                "boxOfficeValue": 60000000
+            }
+        ]""";
+    }
   }
 }
