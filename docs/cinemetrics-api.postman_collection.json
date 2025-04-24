@@ -1,0 +1,470 @@
+{
+	"info": {
+		"_postman_id": "eccdf56b-737b-491a-aa90-255880fe1966",
+		"name": "cinemetrics-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24779732"
+	},
+	"item": [
+		{
+			"name": "user - login admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"const token = response.token || response.access_token || response.jwt; ",
+							"",
+							"if (token) {",
+							"  // Set token as a collection variable",
+							"  pm.collectionVariables.set(\"admin-access-token\", token);",
+							"  console.log(\"🔐 Token saved to collection variable: authToken\");",
+							"} "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{admin}}\",\n  \"password\": \"{{admin-password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/login",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - create",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin-access-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{user-name}}\",\n  \"password\": \"{{user-password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/users",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"const token = response.token || response.access_token || response.jwt; ",
+							"",
+							"if (token) {",
+							"  // Set token as a collection variable",
+							"  pm.collectionVariables.set(\"access-token\", token);",
+							"  console.log(\"🔐 Token saved to collection variable: authToken\");",
+							"} "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{user-name}}\",\n  \"password\": \"{{user-password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/login",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "movie - details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"const movieId = response.movieId; ",
+							"",
+							"if (movieId) {",
+							"  // Set token as a collection variable",
+							"  pm.collectionVariables.set(\"movieId\", movieId);",
+							"} "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/movies/search?title={{title}}",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"movies",
+						"search"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "{{title}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "movie - check oscar",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/movies/{{title}}/oscar",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"movies",
+						"{{title}}",
+						"oscar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ratings - add",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"rating\": 85,\n    \"comment\": \"good movie\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/movies/{{movieId}}/ratings",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"movies",
+						"{{movieId}}",
+						"ratings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ratings - movie title",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/movies/{{title}}/ratings",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"movies",
+						"{{title}}",
+						"ratings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ratings - top 10 movies",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/ratings/top?limit=10",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"ratings",
+						"top"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - logout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{user-name}}\",\n  \"password\": \"{{user-password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/logout",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user - delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"{{user-name}}\",\n  \"password\": \"{{user-password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{cinemetrics-api}}/api/v1/users",
+					"host": [
+						"{{cinemetrics-api}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "cinemetrics-api",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "title",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "user-name",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "access-token",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "user-password",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin-access-token",
+			"value": ""
+		},
+		{
+			"key": "admin",
+			"value": "admin",
+			"type": "default"
+		},
+		{
+			"key": "admin-password",
+			"value": "admin123",
+			"type": "default"
+		},
+		{
+			"key": "movieId",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
