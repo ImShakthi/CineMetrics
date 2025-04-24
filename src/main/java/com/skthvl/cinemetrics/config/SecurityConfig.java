@@ -6,6 +6,7 @@ import com.skthvl.cinemetrics.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +27,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Slf4j
 @EnableWebSecurity
 public class SecurityConfig {
+
+  @Value("${cinemetrics.security.cors-allowed-urls}")
+  private String corsAllowedUrls;
 
   private static final String[] PUBLIC_NON_APP_APIs =
       new String[] {
@@ -79,7 +83,7 @@ public class SecurityConfig {
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
                     .permitAll()
-                    //.hasRole("ADMIN")
+                    // .hasRole("ADMIN")
 
                     // Other APIs
                     .anyRequest()
@@ -119,7 +123,8 @@ public class SecurityConfig {
     config.setAllowedOrigins(
         List.of(
             "http://localhost:8080",
-            "http://localhost:3000")); // to allow frontend and swagger ui to access the APIs
+            "http://localhost:3000",
+            corsAllowedUrls)); // to allow frontend and swagger ui to access the APIs
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true); // required if using cookies or Authorization headers
