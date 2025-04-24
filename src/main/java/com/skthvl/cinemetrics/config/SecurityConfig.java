@@ -83,6 +83,7 @@ public class SecurityConfig {
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
                     .permitAll()
+                    // TODO: revisit and fix this
                     // .hasRole("ADMIN")
 
                     // Other APIs
