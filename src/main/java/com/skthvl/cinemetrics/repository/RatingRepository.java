@@ -31,8 +31,8 @@ public interface RatingRepository extends JpaRepository<Rating, BigInteger> {
               m.box_office_amount_usd AS boxOfficeAmountUsd
           FROM rating r
           JOIN movie m ON m.id = r.movie_id
-          GROUP BY m.id
-          ORDER BY m.box_office_amount_usd DESC
+          GROUP BY m.id, m.title, m.box_office_amount_usd
+          ORDER BY  m.box_office_amount_usd DESC, averageRating DESC
           LIMIT :limit
           """,
       nativeQuery = true)

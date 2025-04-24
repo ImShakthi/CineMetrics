@@ -121,9 +121,10 @@ class CineMetricsApplicationTests {
     }
 
     void assertMovieSearchAndAward() {
-      final String title = "Black Swan";
-      assertGetMovieDetails(title, "2010");
-      assertGetAwardMovieDetails(title);
+      final String title = "forrest gump";
+      final String year = "1994";
+      assertGetMovieDetails(title, year);
+      assertGetAwardMovieDetails(title, year);
     }
 
     void assertRatingsLifecycle(String token) {
@@ -231,7 +232,7 @@ class CineMetricsApplicationTests {
           .then()
           .statusCode(200)
           .body("title", equalTo(title))
-          .body("year", equalTo(year))
+          .body("releaseYear", equalTo(year))
           .body("rated", equalTo("PG-13"))
           .body("released", equalTo("16 Jul 2010"));
     }
@@ -260,8 +261,8 @@ class CineMetricsApplicationTests {
           .body("message", containsString("added rating to movie:"));
     }
 
-    private void assertGetAwardMovieDetails(final String title) {
-      stubGetMoveDetailsByTitleAndYear(title, "2010");
+    private void assertGetAwardMovieDetails(final String title, final String year) {
+      stubGetMoveDetailsByTitleAndYear(title, year);
       given()
           .basePath("/api/v1/movies/{title}/oscar")
           .pathParam("title", title)
@@ -269,8 +270,8 @@ class CineMetricsApplicationTests {
           .get()
           .then()
           .statusCode(200)
-          .body("releaseYear", hasItems(2010))
-          .body("hasWon", hasItems(false));
+          .body("releaseYear", hasItems(Integer.parseInt(year)))
+          .body("hasWon", hasItems(true));
     }
 
     private void assertTopRated(final String token) {

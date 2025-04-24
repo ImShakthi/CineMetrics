@@ -10,6 +10,7 @@ import com.skthvl.cinemetrics.service.RatingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.math.BigInteger;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public class RatingController {
 
     final AddRatingDto rating =
         AddRatingDto.builder()
-            .movieId(Long.valueOf(movieId))
+            .movieId(new BigInteger(movieId))
             .rating(request.getRating())
             .comment(request.getComment())
             .userName(userName)

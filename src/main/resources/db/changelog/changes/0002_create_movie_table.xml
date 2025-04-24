@@ -18,6 +18,66 @@
             <column name="box_office_amount_usd" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <column name="rated" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="released" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="runtime" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="genre" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="director" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="writer" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="actors" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="plot" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="language" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="country" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="awards" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="poster" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="metascore" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="imdb_rating" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="imdb_votes" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="imdbid" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="dvd" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="production" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="website" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
 
         <addUniqueConstraint tableName="movie" columnNames="title,release_year" constraintName="uk_movie_title_year"/>

@@ -29,7 +29,6 @@ public class MovieController {
     this.nominationInfoService = movieInfoService;
   }
 
-  //TODO: get movieid
   @GetMapping("/search")
   public ResponseEntity<MovieInfoResponse> getMovieDetailsByTitle(
       @RequestParam(value = "title") final String title) {

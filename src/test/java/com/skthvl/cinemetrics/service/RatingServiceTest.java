@@ -18,7 +18,6 @@ import com.skthvl.cinemetrics.mapper.RatingMapper;
 import com.skthvl.cinemetrics.model.dto.AddRatingDto;
 import com.skthvl.cinemetrics.model.dto.RatingDto;
 import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
-import com.skthvl.cinemetrics.repository.MovieRepository;
 import com.skthvl.cinemetrics.repository.RatingRepository;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
 import java.math.BigDecimal;
@@ -37,7 +36,7 @@ class RatingServiceTest {
 
   @Mock private RatingRepository ratingRepository;
   @Mock private UserAccountRepository userAccountRepository;
-  @Mock private MovieRepository movieRepository;
+  @Mock private MovieService movieService;
   @Mock private OmdbApiClient omdbApiClient;
   @Mock private RatingMapper ratingMapper;
 
@@ -46,8 +45,7 @@ class RatingServiceTest {
   @BeforeEach
   void setUp() {
     ratingService =
-        new RatingService(
-            ratingRepository, userAccountRepository, movieRepository, omdbApiClient, ratingMapper);
+        new RatingService(ratingRepository, userAccountRepository, movieService, ratingMapper);
   }
 
   @Test
@@ -67,7 +65,8 @@ class RatingServiceTest {
   @Test
   void addRating_shouldSaveRatingSuccessfully() {
     MovieDetailsResponse omdbResponse = mock(MovieDetailsResponse.class);
-    AddRatingDto addRatingDto = new AddRatingDto(85, 1L, "test_user_name", "Fantastic!");
+    AddRatingDto addRatingDto =
+        new AddRatingDto(85, BigInteger.ONE, "test_user_name", "Fantastic!");
     UserAccount user = new UserAccount();
     user.setName("test_user_name");
 
@@ -75,12 +74,9 @@ class RatingServiceTest {
     movie.setId(BigInteger.ONE);
     movie.setTitle("Inception");
     movie.setReleaseYear(2010);
-    movie.setBoxOfficeAmountUsd(null); // simulate missing box office
+    movie.setBoxOfficeAmountUsd(BigInteger.valueOf(825532764));
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
-    when(movieRepository.findById(BigInteger.ONE)).thenReturn(Optional.of(movie));
-
-    when(omdbApiClient.getMoveDetailsByTitleAndYear("Inception", 2010)).thenReturn(omdbResponse);
-    when(omdbResponse.parseBoxOffice()).thenReturn(new BigInteger("825532764"));
+    when(movieService.getMovieById(BigInteger.ONE)).thenReturn(movie);
 
     ratingService.addRating(addRatingDto);
 
@@ -90,7 +86,7 @@ class RatingServiceTest {
 
   @Test
   void addRating_shouldThrowUserDoesNotExistException_whenUserNotFound() {
-    AddRatingDto addRatingDto = new AddRatingDto(80, 1L, "ghost", "Good");
+    AddRatingDto addRatingDto = new AddRatingDto(80, BigInteger.ONE, "ghost", "Good");
 
     when(userAccountRepository.findByName("ghost")).thenReturn(Optional.empty());
 
@@ -99,24 +95,24 @@ class RatingServiceTest {
 
   @Test
   void addRating_shouldThrowMovieNotFoundException_whenMovieNotFound() {
-    AddRatingDto addRatingDto = new AddRatingDto(42, 1L, "test_user_name", "Nice");
+    AddRatingDto addRatingDto = new AddRatingDto(42, BigInteger.ONE, "test_user_name", "Nice");
     UserAccount user = new UserAccount();
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
-    when(movieRepository.findById(BigInteger.ONE)).thenReturn(Optional.empty());
+    when(movieService.getMovieById(BigInteger.ONE)).thenThrow(MovieNotFoundException.class);
 
     assertThrows(MovieNotFoundException.class, () -> ratingService.addRating(addRatingDto));
   }
 
   @Test
   void addRating_shouldThrowDuplicateRatingException_onDataIntegrityViolation() {
-    AddRatingDto addRatingDto = new AddRatingDto(53, 1L, "test_user_name", "Repeated");
+    AddRatingDto addRatingDto = new AddRatingDto(53, BigInteger.ONE, "test_user_name", "Repeated");
     UserAccount user = new UserAccount();
     Movie movie = new Movie();
     movie.setTitle("Interstellar");
     movie.setBoxOfficeAmountUsd(BigInteger.TEN);
 
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
-    when(movieRepository.findById(BigInteger.ONE)).thenReturn(Optional.of(movie));
+    when(movieService.getMovieById(BigInteger.ONE)).thenReturn(movie);
     when(ratingRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 
     assertThrows(DuplicateRatingException.class, () -> ratingService.addRating(addRatingDto));
