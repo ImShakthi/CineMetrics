@@ -31,7 +31,7 @@ highest-rated movies, ranked by box office revenue.
 
 - [Login flow](https://github.com/ImShakthi/CineMetrics/blob/main/docs/sequence-diagram/login-journey.puml)
 - [User creation / deletion flow](https://github.com/ImShakthi/CineMetrics/blob/main/docs/sequence-diagram/login-journey.puml)
-- [Movie details flow](https://github.com/ImShakthi/CineMetrics/blob/main/docs/sequence-diagram/login-journey.puml)
+- [Movie details flow](https://github.com/ImShakthi/CineMetrics/blob/main/docs/sequence-diagram/movie-details-journey.png)
 - [Rating flow](https://github.com/ImShakthi/CineMetrics/blob/main/docs/sequence-diagram/login-journey.puml)
 
 ---

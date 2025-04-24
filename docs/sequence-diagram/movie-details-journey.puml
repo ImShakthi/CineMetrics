@@ -1,0 +1,24 @@
+@startuml
+actor User
+participant "AuthController" as Controller
+participant "AuthService" as Service
+participant "UserService" as UserService
+participant "PasswordEncoder" as PasswordEncoder
+participant "UserRepository" as Repo
+participant "JwtTokenProvider" as JWT
+
+
+User -> Controller: POST /api/v1/auth/login\n{username, password}
+Controller -> Service: authenticateAndGenerateToken\n(username, password)
+Service -> UserService: isUserCredentialValid(userDto)
+UserService -> Repo: findByName(userName)
+Repo --> "UserService": User entity
+"UserService" -> "PasswordEncoder" : validate password
+"UserService" <-- "PasswordEncoder" :  result
+"UserService" --> Service: validate password
+Service -> JWT: generateToken(user)
+JWT --> Service: JWT token with roles
+Service --> Controller: JWT token with roles
+Controller -> User: 200 OK\n{token}
+
+@enduml
