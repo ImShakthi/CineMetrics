@@ -1,24 +1,26 @@
 @startuml
 actor User
-participant "AuthController" as Controller
-participant "AuthService" as Service
-participant "UserService" as UserService
-participant "PasswordEncoder" as PasswordEncoder
-participant "UserRepository" as Repo
-participant "JwtTokenProvider" as JWT
+participant "MovieController" as Controller
+participant "MovieService" as Service
+participant "Redis Cache" as Redis
+participant "MovieRepository" as Repo
+participant "OMDbApiClient" as ApiClient
 
+User -> Controller: GET /api/v1/movies/search\n?title=Inception
+Controller -> Service: getMovieInfoByTitle(title)
+Service -> Repo: findMovieByTitle(title)
+Repo --> Service: null / not found
 
-User -> Controller: POST /api/v1/auth/login\n{username, password}
-Controller -> Service: authenticateAndGenerateToken\n(username, password)
-Service -> UserService: isUserCredentialValid(userDto)
-UserService -> Repo: findByName(userName)
-Repo --> "UserService": User entity
-"UserService" -> "PasswordEncoder" : validate password
-"UserService" <-- "PasswordEncoder" :  result
-"UserService" --> Service: validate password
-Service -> JWT: generateToken(user)
-JWT --> Service: JWT token with roles
-Service --> Controller: JWT token with roles
-Controller -> User: 200 OK\n{token}
+Service -> Redis: get(title)
+Redis --> Service: null / cache miss
 
+Service -> ApiClient: getMovieDetailsByTitle(title)
+ApiClient --> Service: movieDetails
+Service -> Redis: save(title, movieDetails)
+
+Service -> Repo: save(movieDetails)
+Repo --> Service: persisted movie
+
+Service --> Controller: MovieDto
+Controller -> User: 200 OK\n{movieDetails}
 @enduml
