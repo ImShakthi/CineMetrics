@@ -6,6 +6,7 @@ import com.skthvl.cinemetrics.model.request.DeleteUserRequest;
 import com.skthvl.cinemetrics.model.response.MessageResponse;
 import com.skthvl.cinemetrics.service.UserAccountService;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,9 +24,11 @@ public class UserController {
   }
 
   @PostMapping
+  //  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public ResponseEntity<MessageResponse> createUser(
       @RequestBody @Valid final CreateUserRequest request) {
-    userAccountService.registerUser(new UserDto(request.getUsername(), request.getPassword()));
+    userAccountService.registerUser(
+        new UserDto(request.getUsername(), request.getPassword(), List.of("USER")));
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(new MessageResponse("user created successfully"));
@@ -34,7 +37,8 @@ public class UserController {
   @DeleteMapping
   public ResponseEntity<MessageResponse> deleteUser(
       @RequestBody @Valid final DeleteUserRequest request) {
-    userAccountService.deleteUser(new UserDto(request.getUsername(), request.getPassword()));
+    userAccountService.deleteUser(
+        UserDto.builder().userName(request.getUsername()).password(request.getPassword()).build());
 
     return ResponseEntity.ok(new MessageResponse("user deleted successfully"));
   }

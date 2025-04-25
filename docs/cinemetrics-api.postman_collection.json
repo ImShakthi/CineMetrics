@@ -43,13 +43,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{cinemetrics-api}}/api/v1/login",
+					"raw": "{{cinemetrics-api}}/api/v1/auth/login",
 					"host": [
 						"{{cinemetrics-api}}"
 					],
 					"path": [
 						"api",
 						"v1",
+						"auth",
 						"login"
 					]
 				}
@@ -73,7 +74,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"username\": \"{{user-name}}\",\n  \"password\": \"{{user-password}}\"\n}",
+					"raw": "{\n  \"username\": \"{{user-name}}\",\n  \"password\": \"{{user-password}}\",\n  \"roles\":[\"USER\"]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -131,13 +132,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{cinemetrics-api}}/api/v1/login",
+					"raw": "{{cinemetrics-api}}/api/v1/auth/login",
 					"host": [
 						"{{cinemetrics-api}}"
 					],
 					"path": [
 						"api",
 						"v1",
+						"auth",
 						"login"
 					]
 				}
@@ -347,13 +349,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{cinemetrics-api}}/api/v1/logout",
+					"raw": "{{cinemetrics-api}}/api/v1/auth/logout",
 					"host": [
 						"{{cinemetrics-api}}"
 					],
 					"path": [
 						"api",
 						"v1",
+						"auth",
 						"logout"
 					]
 				}
@@ -368,12 +371,12 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "{{access-token}}",
+							"value": "{{admin-access-token}}",
 							"type": "string"
 						}
 					]
 				},
-				"method": "POST",
+				"method": "DELETE",
 				"header": [],
 				"body": {
 					"mode": "raw",

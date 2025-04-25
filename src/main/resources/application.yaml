@@ -46,8 +46,11 @@ cinemetrics:
     prod-url: http://localhost:8080
   jwt:
     secret: ENC(G8EMZFYZuTNzuhCmHMAMDBFnwwQDW6VuLsGaWGFokmmqGcRpeBnZkbyBh7l2CFJR9PvDa+u5UpBowzfDVkLcbFWr8BZTRr6lIl8HcBdwRNw=)
-    expiration-in-milliseconds: 30000
+    expiration-in-milliseconds: 60000
   env:
     jasypt-encryptor-password: ${JASYPT_ENCRYPTOR_PASSWORD}
   security:
-    cors-allowed-urls: https://cinemetrics-api-d21f2e62e3ca.herokuapp.com/
+    cors-allowed-urls:
+    - http://localhost:8080
+    - http://localhost:3000
+    - https://cinemetrics-api-d21f2e62e3ca.herokuapp.com

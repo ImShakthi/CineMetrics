@@ -2,7 +2,6 @@ package com.skthvl.cinemetrics.service;
 
 import com.skthvl.cinemetrics.model.dto.UserDto;
 import com.skthvl.cinemetrics.provider.JwtTokenProvider;
-import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,11 +16,7 @@ public class AuthService {
   }
 
   public String authenticateAndGenerateToken(final UserDto userDto) {
-    if (userAccountService.isUserCredentialValid(userDto)) {
-      return "admin".equalsIgnoreCase(userDto.userName())
-          ? jwtTokenProvider.generateTokenWithRoles(userDto.userName(), List.of("ADMIN"))
-          : jwtTokenProvider.generateToken(userDto.userName());
-    }
-    return "";
+    final var user = userAccountService.getValidUserByCredential(userDto);
+    return jwtTokenProvider.generateTokenWithRoles(userDto.userName(), user.getRoles());
   }
 }

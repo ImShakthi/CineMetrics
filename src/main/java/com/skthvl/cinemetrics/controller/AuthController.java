@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
   private final AuthService authService;
@@ -38,7 +38,10 @@ public class AuthController {
   public ResponseEntity<LoginResponse> login(@RequestBody final LoginRequest request) {
     final var token =
         authService.authenticateAndGenerateToken(
-            new UserDto(request.getUsername(), request.getPassword()));
+            UserDto.builder()
+                .userName(request.getUsername())
+                .password(request.getPassword())
+                .build());
     log.info("Login token generated: {}", token);
 
     return ResponseEntity.ok(new LoginResponse(token));

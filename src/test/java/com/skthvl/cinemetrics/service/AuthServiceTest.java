@@ -1,13 +1,16 @@
 package com.skthvl.cinemetrics.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.skthvl.cinemetrics.entity.UserAccount;
 import com.skthvl.cinemetrics.model.dto.UserDto;
 import com.skthvl.cinemetrics.provider.JwtTokenProvider;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,33 +33,38 @@ class AuthServiceTest {
   @Test
   void authenticateAndGenerateToken_shouldReturnToken_whenCredentialsAreValid() {
     // Given
-    final UserDto userDto = new UserDto("test_user_name", "securePassword123");
+    final var userDto =
+        UserDto.builder().userName("test_user_name").password("securePassword123").build();
+    final var userAccount = UserAccount.builder().name("test_user_name").roles(List.of("USER")).build();
 
-    when(userAccountService.isUserCredentialValid(userDto)).thenReturn(true);
-    when(jwtTokenProvider.generateToken("test_user_name")).thenReturn("mocked-jwt-token");
+    when(userAccountService.getValidUserByCredential(userDto)).thenReturn(userAccount);
+    when(jwtTokenProvider.generateTokenWithRoles("test_user_name", List.of("USER")))
+        .thenReturn("mocked-jwt-token");
 
     // When
     final String token = authService.authenticateAndGenerateToken(userDto);
 
     // Then
     assertEquals("mocked-jwt-token", token);
-    verify(userAccountService).isUserCredentialValid(userDto);
-    verify(jwtTokenProvider).generateToken("test_user_name");
+    verify(userAccountService).getValidUserByCredential(userDto);
+    verify(jwtTokenProvider).generateTokenWithRoles("test_user_name", List.of("USER"));
   }
 
   @Test
   void authenticateAndGenerateToken_shouldReturnEmptyString_whenCredentialsAreInvalid() {
     // Given
-    final UserDto userDto = new UserDto("test_user_name", "wrongPassword");
+    final var userDto =
+        UserDto.builder().userName("test_user_name").password("wrongPassword").build();
+    final var userAccount = UserAccount.builder().name("test_user_name").build();
 
-    when(userAccountService.isUserCredentialValid(userDto)).thenReturn(false);
+    when(userAccountService.getValidUserByCredential(userDto)).thenReturn(userAccount);
 
     // When
     final String token = authService.authenticateAndGenerateToken(userDto);
 
     // Then
-    assertEquals("", token);
-    verify(userAccountService).isUserCredentialValid(userDto);
+    assertNull(token);
+    verify(userAccountService).getValidUserByCredential(userDto);
     verify(jwtTokenProvider, never()).generateToken(any());
   }
 }

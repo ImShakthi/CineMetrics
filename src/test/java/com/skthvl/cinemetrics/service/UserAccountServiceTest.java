@@ -1,8 +1,8 @@
 package com.skthvl.cinemetrics.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -14,6 +14,7 @@ import com.skthvl.cinemetrics.exception.UserDoesNotExistException;
 import com.skthvl.cinemetrics.exception.UserNameAlreadyExistException;
 import com.skthvl.cinemetrics.model.dto.UserDto;
 import com.skthvl.cinemetrics.repository.UserAccountRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class UserAccountServiceTest {
 
   @Test
   void registerUser_shouldSaveNewUser_whenUsernameDoesNotExist() {
-    UserDto userDto = new UserDto("test_user_name", "secret");
+    UserDto userDto = UserDto.builder().userName("test_user_name").password("secret").build();
 
     when(userAccountRepository.existsByName("test_user_name")).thenReturn(false);
     when(passwordEncoder.encode("secret")).thenReturn("hashed-secret");
@@ -53,7 +54,7 @@ class UserAccountServiceTest {
 
   @Test
   void registerUser_shouldThrowException_whenUsernameExists() {
-    UserDto userDto = new UserDto("test_user_name", "secret");
+    UserDto userDto = UserDto.builder().userName("test_user_name").password("secret").build();
 
     when(userAccountRepository.existsByName("test_user_name")).thenReturn(true);
 
@@ -66,29 +67,42 @@ class UserAccountServiceTest {
   }
 
   @Test
-  void isUserCredentialValid_shouldReturnTrue_whenCredentialsMatch() {
-    UserDto userDto = new UserDto("test_user_name", "secret");
+  void getValid_UserByCredential_shouldReturnTrue_whenCredentialsMatch() {
+    UserDto userDto =
+        UserDto.builder()
+            .userName("test_user_name")
+            .password("secret")
+            .roles(List.of("USER"))
+            .build();
     UserAccount user = new UserAccount();
     user.setName("test_user_name");
     user.setPasswordHash("hashed-secret");
+    user.setRoles(List.of("USER"));
 
     when(userAccountRepository.findByName("test_user_name")).thenReturn(Optional.of(user));
     when(passwordEncoder.matches("secret", "hashed-secret")).thenReturn(true);
 
-    assertTrue(userAccountService.isUserCredentialValid(userDto));
+    final UserAccount validUser = userAccountService.getValidUserByCredential(userDto);
+
+    assertNotNull(validUser);
+    assertEquals(validUser.getName(), user.getName());
+    assertEquals(validUser.getPasswordHash(), user.getPasswordHash());
+    assertEquals(validUser.getRoles(), user.getRoles());
   }
 
   @Test
-  void isUserCredentialValid_shouldThrowException_whenUserNotFound() {
+  void isUserCredentialValid_shouldThrowException_whenUserNotFoundUserByCredential() {
     when(userAccountRepository.findByName("ghost")).thenReturn(Optional.empty());
 
+    final var user = UserDto.builder().userName("ghost").password("pass").build();
     assertThrows(
-        UserDoesNotExistException.class,
-        () -> userAccountService.isUserCredentialValid(new UserDto("ghost", "pass")));
+        UserDoesNotExistException.class, () -> userAccountService.getValidUserByCredential(user));
   }
 
   @Test
-  void isUserCredentialValid_shouldThrowException_whenPasswordMismatch() {
+  void getValid_UserByCredential_shouldThrowException_whenPasswordMismatch() {
+    final var userWithWrongPassword =
+        UserDto.builder().userName("test_user_name").password("wrong").build();
     UserAccount user = new UserAccount();
     user.setName("test_user_name");
     user.setPasswordHash("hashed");
@@ -98,12 +112,12 @@ class UserAccountServiceTest {
 
     assertThrows(
         InvalidCredentialException.class,
-        () -> userAccountService.isUserCredentialValid(new UserDto("test_user_name", "wrong")));
+        () -> userAccountService.getValidUserByCredential(userWithWrongPassword));
   }
 
   @Test
   void deleteUser_shouldDeleteUser_whenCredentialsMatch() {
-    UserDto userDto = new UserDto("test_user_name", "secret");
+    UserDto userDto = UserDto.builder().userName("test_user_name").password("secret").build();
     UserAccount user = new UserAccount();
     user.setName("test_user_name");
     user.setPasswordHash("hashed");
@@ -120,14 +134,13 @@ class UserAccountServiceTest {
   void deleteUser_shouldThrowException_whenUserNotFound() {
     when(userAccountRepository.findByName("ghost")).thenReturn(Optional.empty());
 
-    assertThrows(
-        UserDoesNotExistException.class,
-        () -> userAccountService.deleteUser(new UserDto("ghost", "any")));
+    final var user = UserDto.builder().userName("ghost").password("any").build();
+    assertThrows(UserDoesNotExistException.class, () -> userAccountService.deleteUser(user));
   }
 
   @Test
   void deleteUser_shouldThrowException_whenPasswordMismatch() {
-    UserDto userDto = new UserDto("test_user_name", "wrong");
+    UserDto userDto = UserDto.builder().userName("test_user_name").password("wrong").build();
     UserAccount user = new UserAccount();
     user.setName("test_user_name");
     user.setPasswordHash("hashed");

@@ -48,4 +48,5 @@ cinemetrics:
   env:
     jasypt-encryptor-password: jasypt-itest
   security:
-    cors-allowed-urls: https://cinemetrics-api.herokuapp.com/
+    cors-allowed-urls:
+    - https://cinemetrics-api.herokuapp.com/

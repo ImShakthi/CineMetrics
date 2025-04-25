@@ -15,6 +15,9 @@
             <column name="password_hash" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="roles" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -27,6 +30,7 @@
         <insert tableName="user_account">
             <column name="name">admin</column>
             <column name="password_hash">$2a$10$VCLsbE5ST5d/OtCRbXEVZuDZvnT9gj9Z3MRINuU8yaGXBP9/5LeDa</column>
+            <column name="roles">ADMIN</column>
         </insert>
     </changeSet>
 </databaseChangeLog>

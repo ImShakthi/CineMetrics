@@ -40,10 +40,12 @@ class AuthControllerTest {
   @Test
   void login_ShouldReturnTokenResponse() {
     // Given
+    final UserDto userDto = UserDto.builder().userName("testuser").password("testpass").build();
     var request = new LoginRequest("testuser", "testpass");
     var expectedToken = "mocked.jwt.token";
 
-    when(authService.authenticateAndGenerateToken(new UserDto("testuser", "testpass")))
+    when(authService.authenticateAndGenerateToken(
+            userDto))
         .thenReturn(expectedToken);
 
     // When

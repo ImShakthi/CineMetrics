@@ -35,6 +35,7 @@ public class UserAccountService {
         UserAccount.builder()
             .name(userDto.userName())
             .passwordHash(passwordEncoder.encode(userDto.password()))
+            .roles(userDto.roles())
             .build();
 
     userAccountRepository.save(userAccount);
@@ -42,9 +43,8 @@ public class UserAccountService {
   }
 
   @Transactional(readOnly = true)
-  public boolean isUserCredentialValid(final UserDto userDto) {
-    validateCredentials(userDto);
-    return true;
+  public UserAccount getValidUserByCredential(final UserDto userDto) {
+    return validateCredentials(userDto);
   }
 
   @Transactional

@@ -17,6 +17,7 @@ import com.skthvl.cinemetrics.repository.UserAccountRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -81,7 +82,7 @@ class CineMetricsApplicationTests {
   private final String password = "password123";
   private final String userJson =
       """
-          {"username":"%s","password":"%s"}
+          {"username":"%s","password":"%s","roles":["USER"]}
       """
           .formatted(userName, password);
 
@@ -117,6 +118,7 @@ class CineMetricsApplicationTests {
           UserAccount.builder()
               .name("admin")
               .passwordHash("$2a$10$VCLsbE5ST5d/OtCRbXEVZuDZvnT9gj9Z3MRINuU8yaGXBP9/5LeDa")
+              .roles(List.of("ADMIN"))
               .build());
     }
 
@@ -152,9 +154,11 @@ class CineMetricsApplicationTests {
     }
 
     private String getToken(String username, String password) {
-      String json = "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(username, password);
+      String json =
+          "{\"username\":\"%s\",\"password\":\"%s\",\"roles\":[\"USER\"]}"
+              .formatted(username, password);
       return given()
-          .basePath("/api/v1/login")
+          .basePath("/api/v1/auth/login")
           .contentType(ContentType.JSON)
           .body(json)
           .when()
@@ -167,7 +171,7 @@ class CineMetricsApplicationTests {
     private void assertLogout(String token) {
       given()
           .header("Authorization", "Bearer " + token)
-          .basePath("/api/v1/logout")
+          .basePath("/api/v1/auth/logout")
           .when()
           .post()
           .then()

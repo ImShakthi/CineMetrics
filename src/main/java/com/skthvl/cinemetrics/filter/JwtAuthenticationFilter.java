@@ -38,6 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
+//    if (request.getServletPath().contains("/api/v1/auth")) {
+//      filterChain.doFilter(request, response);
+//      return;
+//    }
 
     String header = request.getHeader("Authorization");
     if (header != null && header.startsWith("Bearer ")) {
@@ -54,9 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         ObjectMapper mapper = new ObjectMapper();
         final List<String> roles =
             mapper.convertValue(claims.get("roles"), new TypeReference<>() {});
-
         List<GrantedAuthority> authorities =
             roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+
+        log.info("username: {} Roles: {} authorities {}", username, roles, authorities);
 
         final UsernamePasswordAuthenticationToken authToken =
             new UsernamePasswordAuthenticationToken(username, null, authorities);

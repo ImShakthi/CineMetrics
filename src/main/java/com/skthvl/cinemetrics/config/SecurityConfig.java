@@ -6,7 +6,6 @@ import com.skthvl.cinemetrics.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,10 +25,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @Slf4j
 @EnableWebSecurity
+// @EnableMethodSecurity
 public class SecurityConfig {
 
-  @Value("${cinemetrics.security.cors-allowed-urls}")
-  private String corsAllowedUrls;
+//  @Value("${cinemetrics.security.cors-allowed-urls}")
+//  private List<String> corsAllowedUrls;
+
+  //  private final AuthenticationProvider authenticationProvider;
 
   private static final String[] PUBLIC_NON_APP_APIs =
       new String[] {
@@ -44,22 +46,27 @@ public class SecurityConfig {
         "/configuration/security"
       };
 
-  private static final String[] PUBLIC_APP_APIs =
+  private static final String[] PUBLIC_NO_AUTH_APP_APIs =
       new String[] {
         "/api/v1/movies/search",
         "/api/v1/movies/{title}/oscar",
         "/api/v1/movies/{title}/ratings",
-        "/api/v1/login"
+        "/api/v1/auth/login"
       };
 
   private static final String[] AUTH_APP_APIs =
-      new String[] {"/api/v1/movies/{movieId}/ratings", "/api/v1/ratings/top/**", "/api/v1/logout"};
+      new String[] {
+        "/api/v1/movies/{movieId}/ratings", "/api/v1/ratings/top/**", "/api/v1/auth/logout"
+      };
 
   private static final String[] ADMIN_AUTH_APP_APIs = new String[] {"/api/v1/users"};
 
   private final JwtAuthenticationFilter jwtFilter;
 
-  public SecurityConfig(final JwtAuthenticationFilter jwtFilter) {
+  public SecurityConfig(
+      //      final AuthenticationProvider authenticationProvider,
+      final JwtAuthenticationFilter jwtFilter) {
+    //    this.authenticationProvider = authenticationProvider;
     this.jwtFilter = jwtFilter;
   }
 
@@ -73,25 +80,27 @@ public class SecurityConfig {
                     // public apis (without JWT)
                     .requestMatchers(PUBLIC_NON_APP_APIs)
                     .permitAll()
-                    .requestMatchers(PUBLIC_APP_APIs)
+                    .requestMatchers(PUBLIC_NO_AUTH_APP_APIs)
                     .permitAll()
 
                     // auth apis (with JWT)
                     .requestMatchers(AUTH_APP_APIs)
                     .authenticated()
+                    // .hasAnyRole("USER", "ADMIN")
 
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
                     .authenticated()
+                    // .hasAnyRole("ADMIN")
                     // TODO: revisit and fix this
-                    // .hasRole("ADMIN")
 
                     // Other APIs
                     .anyRequest()
-                    .denyAll())
+                    .authenticated())
 
         // Stateless session (required for JWT)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+        //        .authenticationProvider(authenticationProvider)
 
         // added JWT filter
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -124,8 +133,8 @@ public class SecurityConfig {
     config.setAllowedOrigins(
         List.of(
             "http://localhost:8080",
-            "http://localhost:3000",
-            corsAllowedUrls)); // to allow frontend and swagger ui to access the APIs
+            "http://localhost:3000")); // to allow frontend and swagger ui to access the APIs
+//    corsAllowedUrls
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true); // required if using cookies or Authorization headers
@@ -140,4 +149,13 @@ public class SecurityConfig {
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
+  //  @Bean
+  //  public AuthenticationProvider authenticationProvider(
+  //      UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+  //    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+  //    authProvider.setUserDetailsService(userDetailsService);
+  //    authProvider.setPasswordEncoder(passwordEncoder);
+  //    return authProvider;
+  //  }
 }

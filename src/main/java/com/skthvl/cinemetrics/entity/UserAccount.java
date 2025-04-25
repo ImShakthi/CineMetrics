@@ -1,7 +1,9 @@
 package com.skthvl.cinemetrics.entity;
 
+import com.skthvl.cinemetrics.util.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,11 @@ public class UserAccount extends Auditable {
   @Column(nullable = false)
   @NotBlank
   private String passwordHash;
+
+  @Column(nullable = false)
+  @NotNull
+  @Convert(converter = StringListConverter.class)
+  private List<String> roles = new ArrayList<>();
 
   @OneToMany(mappedBy = "ratedBy", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Rating> ratings = new ArrayList<>();

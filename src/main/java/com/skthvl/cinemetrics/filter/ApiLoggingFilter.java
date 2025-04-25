@@ -18,7 +18,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 public class ApiLoggingFilter extends OncePerRequestFilter {
 
   private static final List<String> SKIP_LOGGING_FOR_URI =
-      List.of("/api-docs", "/swagger-ui", "/h2-console", "/api/v1/users", "/api/v1/login");
+      List.of("/api-docs", "/swagger-ui", "/h2-console", "/api/v1/users", "/api/v1/auth/login");
 
   @Override
   protected void doFilterInternal(
