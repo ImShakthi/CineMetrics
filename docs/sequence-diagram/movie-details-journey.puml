@@ -1,4 +1,6 @@
 @startuml
+title search movie details
+
 actor User
 participant "MovieController" as Controller
 participant "MovieService" as Service

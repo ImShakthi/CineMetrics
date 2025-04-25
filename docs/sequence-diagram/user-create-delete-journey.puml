@@ -1,0 +1,62 @@
+@startuml
+title Admin-Initiated User Management Flow (Create & Delete)
+
+actor Admin
+participant "UserController" as Controller
+participant "UserAccountService" as UserService
+participant "AuthService" as AuthService
+participant "UserAccountRepository" as UserRepo
+participant "PasswordEncoder" as PasswordEncoder
+
+== Create User ==
+
+Admin -> Controller: POST /api/v1/users\n{ "username": "test-user", "password": "password123" }\nAuthorization: Bearer admin_access_token
+Controller -> AuthService: validateAccessToken(admin_access_token)
+AuthService --> Controller: isAuthorized or Unauthorized
+
+alt if authorized
+  Controller -> UserService: registerUser(userDto)
+  UserService -> UserRepo: existsByName(userDto.userName)
+  UserRepo --> UserService: exists or false
+
+  alt if username exists
+    UserService --> Controller: throw UserNameAlreadyExistsException
+  else
+    UserService -> PasswordEncoder: encode(password)
+    PasswordEncoder --> UserService: encodedPassword
+
+    UserService -> UserRepo: save(newUserAccount)
+    UserRepo --> UserService: savedUser
+
+    UserService --> Controller: userResponseDto
+    Controller -> Admin: 201 Created\n{ userResponseDto }
+  end
+else
+  Controller -> Admin: 401 Unauthorized
+end
+
+== Delete User ==
+
+Admin -> Controller: DELETE /api/v1/users/{username}\nAuthorization: Bearer admin_access_token
+Controller -> AuthService: validateAccessToken(admin_access_token)
+AuthService --> Controller: isAuthorized or Unauthorized
+
+alt if authorized
+  Controller -> UserService: deleteUser(username)
+  UserService -> UserRepo: findByName(username)
+  UserRepo --> UserService: user or null
+
+  alt if user exists
+    UserService -> UserRepo: delete(user)
+    UserRepo --> UserService: void
+    UserService --> Controller: 200 {"message":"user deleted successfully"}
+    Controller -> Admin: 200 {"message":"user deleted successfully"}
+  else
+    UserService --> Controller: throw UserNotFoundException
+    Controller -> Admin: 404 Not Found
+  end
+else
+  Controller -> Admin: 401 Unauthorized
+end
+
+@enduml

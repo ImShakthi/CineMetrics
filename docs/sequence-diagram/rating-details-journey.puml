@@ -1,0 +1,36 @@
+@startuml
+title Add Rating by Logged-In User
+
+actor User
+participant "RatingController" as Controller
+participant "RatingService" as RatingService
+participant "MovieService" as MovieService
+participant "AuthService" as AuthService
+participant "UserAccountRepository" as UserRepo
+participant "MovieRepository" as MovieRepo
+participant "OMDbApiClient" as ApiClient
+
+User -> Controller: POST /api/v1/movies/{movieId}/ratings\n{ "rating": 80, "comment": "good" }\nAuthorization: Bearer access_token
+Controller -> AuthService: validateAccessToken(access_token)
+AuthService --> Controller: userName or Unauthorized
+
+Controller -> RatingService: addRating(ratingDto, userName)
+RatingService -> UserRepo: findByName(userName)
+UserRepo --> RatingService: User or UserNotFoundException
+
+RatingService -> MovieService: getMovieById(movieId)
+MovieService -> MovieRepo: findById(movieId)
+MovieRepo --> MovieService: Movie or null
+
+MovieService -> MovieService: checkBoxOfficeInfo(movie)
+alt if box office info is missing
+    MovieService -> ApiClient: getMovieDetails(title)
+    ApiClient --> MovieService: movieDetails or MovieNotFoundException
+    MovieService -> MovieRepo: save(updatedMovie)
+end
+
+RatingService -> RatingService: saveRating(user, movie, ratingDto)
+RatingService --> Controller: ratingResponseDto
+
+Controller -> User: 201 Created\n{ ratingDto }
+@enduml

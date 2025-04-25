@@ -80,13 +80,13 @@ public class SecurityConfig {
 
                     // auth apis (with JWT)
                     .requestMatchers(AUTH_APP_APIs)
-                    // .authenticated()
-                    .hasAnyRole("USER", "ADMIN")
+                     .authenticated()
+//                    .hasAnyRole("USER", "ADMIN")
 
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
-                    .hasAnyRole("ADMIN")
-                    // .authenticated()
+//                    .hasAnyRole("ADMIN")
+                     .authenticated()
 
                     // Other APIs
                     .anyRequest()

@@ -51,12 +51,16 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler({
     MovieNotFoundException.class,
-    UserDoesNotExistException.class,
     UserNameAlreadyExistException.class,
     DuplicateRatingException.class
   })
   public ResponseEntity<ErrorResponse> handleBadRequest(final Exception ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+  }
+
+  @ExceptionHandler({UserDoesNotExistException.class})
+  public ResponseEntity<ErrorResponse> handleUserDoesNotExistException(final Exception ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
   }
 
   @ExceptionHandler({InvalidApiKeyException.class, InvalidCredentialException.class})

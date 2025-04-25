@@ -1,4 +1,6 @@
 @startuml
+title user login jounrney
+
 actor User
 participant "AuthController" as Controller
 participant "AuthService" as Service
