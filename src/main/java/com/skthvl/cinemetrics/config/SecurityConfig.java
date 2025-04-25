@@ -6,6 +6,7 @@ import com.skthvl.cinemetrics.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,13 +26,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @Slf4j
 @EnableWebSecurity
-// @EnableMethodSecurity
 public class SecurityConfig {
 
-//  @Value("${cinemetrics.security.cors-allowed-urls}")
-//  private List<String> corsAllowedUrls;
-
-  //  private final AuthenticationProvider authenticationProvider;
+  @Value("#{'${cinemetrics.security.cors-allowed-origins}'.split(',')}")
+  private List<String> corsAllowedUrls;
 
   private static final String[] PUBLIC_NON_APP_APIs =
       new String[] {
@@ -63,10 +61,7 @@ public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtFilter;
 
-  public SecurityConfig(
-      //      final AuthenticationProvider authenticationProvider,
-      final JwtAuthenticationFilter jwtFilter) {
-    //    this.authenticationProvider = authenticationProvider;
+  public SecurityConfig(final JwtAuthenticationFilter jwtFilter) {
     this.jwtFilter = jwtFilter;
   }
 
@@ -85,14 +80,13 @@ public class SecurityConfig {
 
                     // auth apis (with JWT)
                     .requestMatchers(AUTH_APP_APIs)
-                    .authenticated()
-                    // .hasAnyRole("USER", "ADMIN")
+                    // .authenticated()
+                    .hasAnyRole("USER", "ADMIN")
 
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
-                    .authenticated()
-                    // .hasAnyRole("ADMIN")
-                    // TODO: revisit and fix this
+                    .hasAnyRole("ADMIN")
+                    // .authenticated()
 
                     // Other APIs
                     .anyRequest()
@@ -130,11 +124,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(
-        List.of(
-            "http://localhost:8080",
-            "http://localhost:3000")); // to allow frontend and swagger ui to access the APIs
-//    corsAllowedUrls
+    config.setAllowedOrigins(corsAllowedUrls);
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true); // required if using cookies or Authorization headers
@@ -149,13 +139,4 @@ public class SecurityConfig {
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
-  //  @Bean
-  //  public AuthenticationProvider authenticationProvider(
-  //      UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-  //    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-  //    authProvider.setUserDetailsService(userDetailsService);
-  //    authProvider.setPasswordEncoder(passwordEncoder);
-  //    return authProvider;
-  //  }
 }

@@ -16,7 +16,7 @@ spring:
     enabled: true
     drop-first: false
     change-log: classpath:db/changelog/db.changelog-master.xml
-#    default-schema:
+  #    default-schema:
   jpa:
     hibernate:
       ddl-auto: none
@@ -50,7 +50,4 @@ cinemetrics:
   env:
     jasypt-encryptor-password: ${JASYPT_ENCRYPTOR_PASSWORD}
   security:
-    cors-allowed-urls:
-    - http://localhost:8080
-    - http://localhost:3000
-    - https://cinemetrics-api-d21f2e62e3ca.herokuapp.com
+    cors-allowed-origins: http://localhost:8080,http://localhost:3000,https://cinemetrics-api-d21f2e62e3ca.herokuapp.com
