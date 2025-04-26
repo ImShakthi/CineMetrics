@@ -13,6 +13,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+/**
+ * A filter for logging HTTP requests and responses in a Spring Boot application. This filter
+ * ensures that each request and response is logged only once per request lifecycle. Specific URIs
+ * can be skipped from logging.
+ */
 @Slf4j
 @Component
 public class ApiLoggingFilter extends OncePerRequestFilter {
@@ -20,6 +25,18 @@ public class ApiLoggingFilter extends OncePerRequestFilter {
   private static final List<String> SKIP_LOGGING_FOR_URI =
       List.of("/api-docs", "/swagger-ui", "/h2-console", "/api/v1/users", "/api/v1/auth/login");
 
+  /**
+   * Processes incoming HTTP requests and responses, and logs their details such as method, URI, and
+   * optionally their content. This method leverages {@link ContentCachingRequestWrapper} and {@link
+   * ContentCachingResponseWrapper} to allow repeated reads of the request and response content
+   * streams.
+   *
+   * @param req the current HTTP request
+   * @param res the current HTTP response
+   * @param chain the filter chain to pass the request and response to the next filter
+   * @throws ServletException if any servlet-specific exception occurs
+   * @throws IOException if an input or output exception occurs
+   */
   @Override
   protected void doFilterInternal(
       final HttpServletRequest req, final HttpServletResponse res, FilterChain chain)

@@ -13,6 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration class for setting up OpenAPI documentation in the application.
+ *
+ * <p>This class configures the OpenAPI specification for describing the API endpoints, security,
+ * and available server environments.
+ */
 @Configuration
 public class OpenApiConfig {
 
@@ -22,8 +28,17 @@ public class OpenApiConfig {
   @Value("${cinemetrics.openapi.prod-url}")
   private String prodUrl;
 
+  /**
+   * Configures and provides an OpenAPI specification for the application.
+   *
+   * <p>This method sets up the OpenAPI documentation with information about the API, including its
+   * title, version, contact information, licensing, security schemes, and the server environments
+   * for development and production.
+   *
+   * @return a configured {@link OpenAPI} object containing the API documentation details.
+   */
   @Bean
-  public OpenAPI myOpenAPI() {
+  public OpenAPI cineMetricsOpenApi() {
     final Server devServer = new Server();
     devServer.setUrl(devUrl);
     devServer.setDescription("Server URL in Development environment");

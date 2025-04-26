@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A converter class for handling the persistence of a {@code List<String>} as a single {@code
+ * String} in a database column.
+ */
 @Converter
 public class StringListConverter implements AttributeConverter<List<String>, String> {
 

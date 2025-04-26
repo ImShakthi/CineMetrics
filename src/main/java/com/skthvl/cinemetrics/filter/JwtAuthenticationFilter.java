@@ -20,6 +20,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * A filter that intercepts HTTP requests to authenticate users based on JWT (JSON Web Token). This
+ * filter extracts the JWT from the "Authorization" header, validates the token, and sets the user's
+ * authentication details in the security context.
+ */
 @Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -34,6 +39,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     this.invalidatedTokenService = invalidatedTokenService;
   }
 
+  /**
+   * Handles incoming HTTP requests by checking the "Authorization" header for a JWT token. If a
+   * valid token is found and verified, the user's authentication details are set into the
+   * SecurityContext. Invalid or missing tokens result in an unauthorized response.
+   *
+   * @param request the current HTTP request to be filtered
+   * @param response the current HTTP response for the request
+   * @param filterChain the filter chain to pass the request and response to the next filter
+   * @throws ServletException if an error occurs during request processing
+   * @throws IOException if an input or output exception occurs
+   */
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

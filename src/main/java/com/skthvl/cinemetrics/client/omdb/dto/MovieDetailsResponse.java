@@ -9,6 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Response object mapping JSON data from OMDB API movie details endpoint. Created automatically via
+ * constructor, builder pattern, or JSON deserialization.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -71,7 +75,7 @@ public class MovieDetailsResponse implements OmdbBaseResponse {
   private String imdbVotes;
 
   @JsonProperty("imdbID")
-  private String imdbID;
+  private String imdbId;
 
   @JsonProperty("Type")
   private String type;
@@ -94,6 +98,12 @@ public class MovieDetailsResponse implements OmdbBaseResponse {
   @JsonProperty("Error")
   private String error;
 
+  /**
+   * Parses the box office string value into a BigInteger. Removes all non-digit characters before
+   * parsing.
+   *
+   * @return box office value as BigInteger
+   */
   public BigInteger parseBoxOffice() {
     return BigInteger.valueOf(Long.parseLong(boxOffice.replaceAll("[^\\d.]", "")));
   }

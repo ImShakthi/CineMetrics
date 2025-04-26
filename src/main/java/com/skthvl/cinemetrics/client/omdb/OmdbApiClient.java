@@ -17,19 +17,41 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
+/**
+ * Client for interacting with the Open Movie Database (OMDB) API. This class handles HTTP requests
+ * to fetch movie details using the OMDB API. Responses are cached to improve performance and reduce
+ * API calls.
+ */
 @Slf4j
 @Configuration
 public class OmdbApiClient {
 
+  /** RestClient instance configured for OMDB API calls. */
   private final RestClient omdbApiRestClient;
 
+  /** API key required for authentication with OMDB API. */
   @Value("${cinemetrics.client.omdbapi.api-key}")
   private String apiKey;
 
+  /**
+   * Constructs an OmdbApiClient with the specified RestClient.
+   *
+   * @param omdbApiRestClient The REST client configured for OMDB API communication
+   */
   public OmdbApiClient(@Qualifier("omdbApiRestClient") final RestClient omdbApiRestClient) {
     this.omdbApiRestClient = omdbApiRestClient;
   }
 
+  /**
+   * Retrieves detailed information about a movie using its title. Utilizes the OMDB API to fetch
+   * the movie details and caches the results.
+   *
+   * @param title the title of the movie to retrieve details for
+   * @return a {@link MovieDetailsResponse} containing the movie details, such as title, year,
+   *     director, plot, and more
+   * @throws ApiClientException if an error occurs while fetching movie details or the movie is not
+   *     found
+   */
   @Cacheable(value = "movies", key = "#title")
   public MovieDetailsResponse getMoveDetailsByTitle(final String title) {
     log.info("getting movie details by title: {}", title);
@@ -47,6 +69,17 @@ public class OmdbApiClient {
     return handleResponse(response);
   }
 
+  /**
+   * Retrieves detailed information about a movie using its title and release year. Utilizes the
+   * OMDB API and caches the results for improved performance.
+   *
+   * @param title the title of the movie to retrieve details for
+   * @param year the release year of the movie to retrieve details for
+   * @return a {@link MovieDetailsResponse} containing the movie details, such as title, year,
+   *     director, plot, and more
+   * @throws ApiClientException if an error occurs while fetching the movie details or if the movie
+   *     is not found
+   */
   @Cacheable(value = "movie", key = "#title+'-'+#year")
   public MovieDetailsResponse getMoveDetailsByTitleAndYear(final String title, final int year) {
     log.info("getting movie details by title: {} and year: {}", title, year);

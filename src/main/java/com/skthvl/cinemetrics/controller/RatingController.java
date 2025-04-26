@@ -16,8 +16,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * RatingController is a REST controller that provides endpoints to manage movie ratings. It handles
+ * operations such as retrieving ratings for a specific movie, creating a new rating, and fetching
+ * the top-rated movies.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
@@ -32,6 +43,14 @@ public class RatingController {
     this.ratingMapper = ratingMapper;
   }
 
+  /**
+   * Retrieves a list of movie ratings based on the specified movie title.
+   *
+   * @param title the title of the movie for which ratings are to be fetched. Must not be null or
+   *     empty.
+   * @return a {@code ResponseEntity} containing a list of {@code RatingResponse} objects
+   *     representing the ratings of the movie.
+   */
   @GetMapping("/movies/{title}/ratings")
   public ResponseEntity<List<RatingResponse>> getRatings(
       @PathVariable(name = "title") @NotBlank(message = "title must not be empty")
@@ -42,6 +61,17 @@ public class RatingController {
     return ResponseEntity.ok(ratingMapper.toRatingResponse(ratingDto));
   }
 
+  /**
+   * Creates a new rating for a specified movie.
+   *
+   * @param authentication the authentication object containing user credentials. Must not be null;
+   *     authentication is required.
+   * @param movieId the ID of the movie to which the rating will be associated. Must not be blank.
+   * @param request the {@code CreateRatingRequest} object containing rating details such as rating
+   *     value and comment. Must be valid and not null.
+   * @return a {@code ResponseEntity} containing a {@code MessageResponse} that indicates the
+   *     success or failure of adding the rating.
+   */
   @SecurityRequirement(name = "bearerAuth")
   @PostMapping("/movies/{movieId}/ratings")
   public ResponseEntity<MessageResponse> createRating(
@@ -55,7 +85,7 @@ public class RatingController {
     }
 
     final var userName = authentication.getName();
-    log.info("User name: {}", userName);
+    log.debug("User name: {}", userName);
 
     final AddRatingDto rating =
         AddRatingDto.builder()
@@ -71,8 +101,15 @@ public class RatingController {
         new MessageResponse("added rating to movie: " + ratingDto.getMovieTitle()));
   }
 
+  /**
+   * Retrieves a list of top-rated movies with a specified limit.
+   *
+   * @param limit the maximum number of top-rated movies to retrieve. Must be a positive integer.
+   * @return a {@code ResponseEntity} containing a list of {@code TopRatedMovieResponse} objects
+   *     that represent the top-rated movies.
+   */
   @GetMapping("/ratings/top")
-  public ResponseEntity<List<TopRatedMovieResponse>> getTop10Ratings(
+  public ResponseEntity<List<TopRatedMovieResponse>> getTopRatings(
       @RequestParam(name = "limit") final int limit) {
     log.info("Getting top 10 rated movies");
     final var topRatedMovies = ratingService.getTopRatedMovies(limit);

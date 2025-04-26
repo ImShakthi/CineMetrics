@@ -15,14 +15,29 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service for managing movie ratings, including creation, retrieval, and analytics.
+ */
 @Slf4j
 @Service
 public class RatingService {
+  /** Repository for managing rating entities. */
   private final RatingRepository ratingRepository;
+  /** Repository for managing user account entities. */
   private final UserAccountRepository userAccountRepository;
+  /** Service for managing movie operations. */
   private final MovieService movieService;
+  /** Mapper for converting between rating entities and DTOs. */
   private final RatingMapper ratingMapper;
 
+  /**
+   * Constructs a new RatingService with required dependencies.
+   *
+   * @param ratingRepository Repository for rating operations
+   * @param userAccountRepository Repository for user account operations
+   * @param movieService Service for movie operations
+   * @param ratingMapper Mapper for rating entity conversions
+   */
   public RatingService(
       final RatingRepository ratingRepository,
       final UserAccountRepository userAccountRepository,
@@ -34,11 +49,25 @@ public class RatingService {
     this.ratingMapper = ratingMapper;
   }
 
+  /**
+   * Retrieves all ratings for a movie by its title.
+   *
+   * @param title The movie title to search for
+   * @return List of ratings for the specified movie
+   */
   @Transactional(readOnly = true)
   public List<RatingDto> getRatingInfo(final String title) {
     return ratingRepository.findRatingDetailsByTitleIgnoreCase(title);
   }
 
+  /**
+   * Adds a new rating for a movie.
+   *
+   * @param ratingDto The rating information to add
+   * @return The created rating
+   * @throws UserDoesNotExistException if the user doesn't exist
+   * @throws DuplicateRatingException if the user has already rated the movie
+   */
   @Transactional
   public RatingDto addRating(final AddRatingDto ratingDto) {
     final var userAccount =
@@ -68,6 +97,12 @@ public class RatingService {
     }
   }
 
+  /**
+   * Retrieves top-rated movies ordered by box office earnings.
+   *
+   * @param limit Maximum number of movies to return
+   * @return List of top-rated movies with their ratings and earnings
+   */
   @Transactional(readOnly = true)
   public List<TopRatedMovieDto> getTopRatedMovies(final int limit) {
     return ratingRepository.getTopRatedMoviesOrderByBoxOffice(limit);

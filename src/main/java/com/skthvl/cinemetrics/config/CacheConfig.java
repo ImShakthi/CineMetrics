@@ -12,6 +12,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
+/** Configuration class for setting up cache management in the application using Redis. */
 @Configuration
 public class CacheConfig {
 
@@ -24,6 +25,16 @@ public class CacheConfig {
     this.connectionFactory = connectionFactory;
   }
 
+  /**
+   * Configures and provides a RedisCacheManager bean for managing application caching.
+   *
+   * <p>This method sets up and returns a RedisCacheManager instance with custom configurations: -
+   * Values are serialized and deserialized using Jackson2JsonRedisSerializer with ObjectMapper
+   * configured for type information. - Cache entries have a time-to-live (TTL) based on the
+   * expirationTime property. - Caching null values is disabled to ensure efficient storage.
+   *
+   * @return a configured {@link RedisCacheManager} instance for managing Redis-based caching.
+   */
   @Bean
   public RedisCacheManager cacheManager() {
     final ObjectMapper objectMapper =

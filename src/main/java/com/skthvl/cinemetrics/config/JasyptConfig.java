@@ -7,12 +7,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/** Configuration class for setting up Jasypt-based encryption in the application. */
 @Configuration
 public class JasyptConfig {
 
   @Value("${cinemetrics.env.jasypt-encryptor-password}")
   private String jasyptEncryptorPassword;
 
+  /**
+   * Creates and configures a Jasypt string encryptor bean for encrypting and decrypting sensitive
+   * data within the application.
+   *
+   * @return a configured {@link StringEncryptor} instance for encrypting and decrypting strings.
+   */
   @Bean("jasyptStringEncryptor")
   public StringEncryptor stringEncryptor() {
 

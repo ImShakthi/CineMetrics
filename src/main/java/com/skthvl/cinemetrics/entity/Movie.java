@@ -6,13 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.math.BigInteger;
-import lombok.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Represents a movie entity in the system. It captures details such as the movie's title, release
+ * year, box office revenue, ratings, genres, and other metadata about the movie.
+ */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -65,7 +69,7 @@ public class Movie {
 
   @Column private String imdbVotes;
 
-  @Column private String imdbID;
+  @Column private String imdbId;
 
   @Column private String type;
 

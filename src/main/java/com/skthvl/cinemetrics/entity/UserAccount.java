@@ -1,7 +1,14 @@
 package com.skthvl.cinemetrics.entity;
 
 import com.skthvl.cinemetrics.util.StringListConverter;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -14,6 +21,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Represents a user account in the system. This entity includes details such as the user's name,
+ * password hash, and roles. It also manages the user's ratings for movies.
+ */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

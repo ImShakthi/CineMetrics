@@ -23,6 +23,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Security configuration class for the application, responsible for setting up authentication,
+ * authorization, CORS, CSRF, and security filter chains.
+ */
 @Configuration
 @Slf4j
 @EnableWebSecurity
@@ -65,6 +69,15 @@ public class SecurityConfig {
     this.jwtFilter = jwtFilter;
   }
 
+  /**
+   * Configures the SecurityFilterChain for the application, defining security settings such as
+   * disabling CSRF, configuring CORS, managing authentication policies for different API endpoints,
+   * and adding a JWT filter for stateless session management.
+   *
+   * @param http the {@link HttpSecurity} object used to configure security settings
+   * @return a configured {@link SecurityFilterChain} instance
+   * @throws Exception if an error occurs during configuration
+   */
   @Bean
   public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -80,11 +93,11 @@ public class SecurityConfig {
 
                     // auth apis (with JWT)
                     .requestMatchers(AUTH_APP_APIs)
-                     .authenticated()
+                    .authenticated()
 
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
-                     .authenticated()
+                    .authenticated()
 
                     // Other APIs
                     .anyRequest()
@@ -112,12 +125,31 @@ public class SecurityConfig {
     return http.build();
   }
 
+  /**
+   * Provides a Spring Bean that configures and retrieves an {@link AuthenticationManager} instance
+   * from the provided {@link AuthenticationConfiguration}.
+   *
+   * @param config the {@link AuthenticationConfiguration} used to obtain the {@link
+   *     AuthenticationManager}
+   * @return the configured {@link AuthenticationManager} instance
+   * @throws Exception if an error occurs while retrieving the {@link AuthenticationManager}
+   */
   @Bean
   public AuthenticationManager authenticationManager(final AuthenticationConfiguration config)
       throws Exception {
     return config.getAuthenticationManager();
   }
 
+  /**
+   * Configures and provides a CORS (Cross-Origin Resource Sharing) configuration source to handle
+   * requests coming from different origins.
+   *
+   * <p>The method defines allowed origins, methods, headers, and credentials settings for CORS. It
+   * registers these configurations with a {@link UrlBasedCorsConfigurationSource} for
+   * application-wide use.
+   *
+   * @return a configured {@link CorsConfigurationSource} instance that specifies the CORS settings.
+   */
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     final CorsConfiguration config = new CorsConfiguration();
@@ -132,6 +164,16 @@ public class SecurityConfig {
     return source;
   }
 
+  /**
+   * Provides a Spring Bean that configures and returns a {@link PasswordEncoder} for securing user
+   * passwords.
+   *
+   * <p>This method returns an instance of {@link BCryptPasswordEncoder}, which applies the BCrypt
+   * hashing algorithm to encode passwords. BCrypt is a secure and adaptive algorithm well-suited
+   * for password storage.
+   *
+   * @return a configured {@link PasswordEncoder} instance using BCrypt hashing.
+   */
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
