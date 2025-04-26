@@ -81,11 +81,9 @@ public class SecurityConfig {
                     // auth apis (with JWT)
                     .requestMatchers(AUTH_APP_APIs)
                      .authenticated()
-//                    .hasAnyRole("USER", "ADMIN")
 
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
-//                    .hasAnyRole("ADMIN")
                      .authenticated()
 
                     // Other APIs
@@ -94,7 +92,6 @@ public class SecurityConfig {
 
         // Stateless session (required for JWT)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-        //        .authenticationProvider(authenticationProvider)
 
         // added JWT filter
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

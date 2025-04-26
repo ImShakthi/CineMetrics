@@ -18,8 +18,14 @@ public class CacheConfig {
   @Value("${cinemetrics.cache.expiration-in-minutes}")
   private int expirationTime;
 
+  private final RedisConnectionFactory connectionFactory;
+
+  public CacheConfig(final RedisConnectionFactory connectionFactory) {
+    this.connectionFactory = connectionFactory;
+  }
+
   @Bean
-  public RedisCacheManager cacheManager(final RedisConnectionFactory connectionFactory) {
+  public RedisCacheManager cacheManager() {
     final ObjectMapper objectMapper =
         new ObjectMapper()
             .activateDefaultTyping(
