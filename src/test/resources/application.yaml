@@ -40,8 +40,8 @@ cinemetrics:
       base-url: http://localhost:${wiremock.server.port}
       api-key: test-api-key
   openapi:
+    prod-url: https://cinemetrics-api-d21f2e62e3ca.herokuapp.com
     dev-url: http://localhost:8080
-    prod-url: http://localhost:8080
   jwt:
     secret: ENC(piKfYmhWClAPtJrkV+1KZ+y/d6Fs9UovXIXcjt+ZLlSEy0nEcIfhYWhdeXKxVWavfDQWxPVme3N9vbU7d6oNeHfHJyAE/GcYxqYlTHyHHXg=)
     expiration-in-milliseconds: 600000
