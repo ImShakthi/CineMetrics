@@ -43,7 +43,7 @@ cinemetrics:
       api-key: ENC(WtJFsHx3BTobZAu8V3PDT7ynWBseQcna)
   openapi:
     dev-url: http://localhost:8080
-    prod-url: http://localhost:8080
+    prod-url: https://cinemetrics-api-d21f2e62e3ca.herokuapp.com
   jwt:
     secret: ENC(G8EMZFYZuTNzuhCmHMAMDBFnwwQDW6VuLsGaWGFokmmqGcRpeBnZkbyBh7l2CFJR9PvDa+u5UpBowzfDVkLcbFWr8BZTRr6lIl8HcBdwRNw=)
     expiration-in-milliseconds: 60000
