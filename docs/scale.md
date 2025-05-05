@@ -73,20 +73,22 @@ enhancement.
 ----
 📊 How Quality of Service Is Maintained
 
-Concern | Solution
-Latency | Caching, async queues, DB optimization
-Throughput | Horizontal scaling (pods, DB replicas, Kafka consumers)
-Fault Tolerance | Circuit breakers, retries, self-healing infra
-High Availability | Multi-zone deployments, load balancing, health checks
-Data Integrity | Idempotent operations, deduplication, transactional consistency handling
-Monitoring | Logs, metrics, alerts, dashboards
+| Concern           | Solution                                                                 |
+|-------------------|--------------------------------------------------------------------------|
+| Latency           | Caching, async queues, DB optimization                                   |
+| Throughput        | Horizontal scaling (pods, DB replicas, Kafka consumers)                  |
+| Fault Tolerance   | Circuit breakers, retries, self-healing infra                            |
+| High Availability | Multi-zone deployments, load balancing, health checks                    |
+| Data Integrity    | Idempotent operations, deduplication, transactional consistency handling |
+| Monitoring        | Logs, metrics, alerts, dashboards                                        |
 
 ----
 📈 Summary
 
-Stage | Daily Users | Architecture Style | Major Needs
-Early Stage | 100 – 10k | Monolith / Simple API | Basic DB tuning, caching
-Growth Stage | 10k – 1M | Microservices / K8s | Load balancing, async processing
-Scale-Up Stage | 1M – 10M | Event-driven & Sharded | Queueing, advanced caching, observability, DB scaling
+| Stage          | Daily Users | Architecture Style     | Major Needs                                           |
+|----------------|-------------|------------------------|-------------------------------------------------------|
+| Early Stage    | 100 – 10k   | Monolith / Simple API  | Basic DB tuning, caching                              |
+| Growth Stage   | 10k – 1M    | Microservices / K8s    | Load balancing, async processing                      |
+| Scale-Up Stage | 1M – 10M    | Event-driven & Sharded | Queueing, advanced caching, observability, DB scaling |
 
 ---
