@@ -131,7 +131,9 @@ class CineMetricsApplicationTests {
 
     void assertRatingsLifecycle(String token) {
       String title = "Black Swan";
-      assertEquals("[]", getRatingsForMovieBy(title).asString());
+      assertEquals(
+          "{\"content\":[],\"page\":0,\"size\":5,\"totalElements\":0,\"totalPages\":0}",
+          getRatingsForMovieBy(title).asString());
 
       addRating(token, 1, 85, "good movie");
 

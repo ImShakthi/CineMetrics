@@ -1,9 +1,12 @@
 package com.skthvl.cinemetrics.controller;
 
+import static com.skthvl.cinemetrics.util.PageUtils.mapPaginatedResponse;
+
 import com.skthvl.cinemetrics.mapper.RatingMapper;
 import com.skthvl.cinemetrics.model.dto.AddRatingDto;
 import com.skthvl.cinemetrics.model.request.CreateRatingRequest;
 import com.skthvl.cinemetrics.model.response.MessageResponse;
+import com.skthvl.cinemetrics.model.response.PaginatedResponse;
 import com.skthvl.cinemetrics.model.response.RatingResponse;
 import com.skthvl.cinemetrics.model.response.TopRatedMovieResponse;
 import com.skthvl.cinemetrics.service.RatingService;
@@ -48,17 +51,21 @@ public class RatingController {
    *
    * @param title the title of the movie for which ratings are to be fetched. Must not be null or
    *     empty.
-   * @return a {@code ResponseEntity} containing a list of {@code RatingResponse} objects
+   * @param page The page index for pagination. Defaults to 0.
+   * @param size The number of records per page for pagination. Defaults to 5.
+   * @return a {@code ResponseEntity} containing a list of paged {@code RatingResponse} objects
    *     representing the ratings of the movie.
    */
   @GetMapping("/movies/{title}/ratings")
-  public ResponseEntity<List<RatingResponse>> getRatings(
+  public ResponseEntity<PaginatedResponse<RatingResponse>> getRatings(
       @PathVariable(name = "title") @NotBlank(message = "title must not be empty")
-          final String title) {
+          final String title,
+      @RequestParam(defaultValue = "0") final int page,
+      @RequestParam(defaultValue = "5") final int size) {
     log.info("Getting ratings for movie: {}", title);
-    final var ratingDto = ratingService.getRatingInfo(title);
+    final var ratingDtoPage = ratingService.getRatingInfo(title, page, size);
 
-    return ResponseEntity.ok(ratingMapper.toRatingResponse(ratingDto));
+    return ResponseEntity.ok(mapPaginatedResponse(ratingDtoPage, ratingMapper::to));
   }
 
   /**

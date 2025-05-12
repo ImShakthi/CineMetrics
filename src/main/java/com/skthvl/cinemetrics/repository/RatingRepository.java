@@ -5,6 +5,8 @@ import com.skthvl.cinemetrics.model.dto.RatingDto;
 import com.skthvl.cinemetrics.model.dto.TopRatedMovieDto;
 import java.math.BigInteger;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,15 +28,25 @@ public interface RatingRepository extends JpaRepository<Rating, BigInteger> {
    *     specified movie title
    */
   @Query(
-      """
+      value =
+          """
           SELECT
               new com.skthvl.cinemetrics.model.dto.RatingDto(r.rating, m.title, u.name, r.comment)
               FROM Rating r
           JOIN r.movie m
           JOIN r.ratedBy u
           WHERE LOWER(m.title) = LOWER(:title)
+          """,
+      countQuery =
+          """
+          SELECT
+              COUNT(r)
+              FROM Rating r
+          JOIN r.movie m
+          JOIN r.ratedBy u
+          WHERE LOWER(m.title) = LOWER(:title)
           """)
-  List<RatingDto> findRatingDetailsByTitleIgnoreCase(final String title);
+  Page<RatingDto> findRatingDetailsByTitleIgnoreCase(final String title, final Pageable pageable);
 
   /**
    * Retrieves a list of the top-rated movies ordered by box office revenue in descending order, and

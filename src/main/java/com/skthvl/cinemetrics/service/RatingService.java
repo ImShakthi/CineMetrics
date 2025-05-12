@@ -12,6 +12,8 @@ import com.skthvl.cinemetrics.repository.UserAccountRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,8 +58,8 @@ public class RatingService {
    * @return List of ratings for the specified movie
    */
   @Transactional(readOnly = true)
-  public List<RatingDto> getRatingInfo(final String title) {
-    return ratingRepository.findRatingDetailsByTitleIgnoreCase(title);
+  public Page<RatingDto> getRatingInfo(final String title, final int page, final int size) {
+    return ratingRepository.findRatingDetailsByTitleIgnoreCase(title, PageRequest.of(page, size));
   }
 
   /**

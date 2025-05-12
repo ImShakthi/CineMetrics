@@ -30,6 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class RatingServiceTest {
@@ -50,16 +53,18 @@ class RatingServiceTest {
 
   @Test
   void getRatingInfo_shouldReturnRatingsForMovieTitle() {
+    final var pageable = Pageable.ofSize(5);
     String title = "Inception";
     RatingDto ratingDto = new RatingDto(75, title, "test_user_name", "Great movie!");
 
-    when(ratingRepository.findRatingDetailsByTitleIgnoreCase(title)).thenReturn(List.of(ratingDto));
+    when(ratingRepository.findRatingDetailsByTitleIgnoreCase(title, pageable))
+        .thenReturn(new PageImpl<>(List.of(ratingDto)));
 
-    final List<RatingDto> result = ratingService.getRatingInfo(title);
+    final Page<RatingDto> result = ratingService.getRatingInfo(title, 0, 5);
 
-    assertEquals(1, result.size());
-    assertEquals("Inception", result.getFirst().getMovieTitle());
-    verify(ratingRepository).findRatingDetailsByTitleIgnoreCase(title);
+    assertEquals(1, result.getTotalElements());
+    assertEquals("Inception", result.getContent().getFirst().getMovieTitle());
+    verify(ratingRepository).findRatingDetailsByTitleIgnoreCase(title, pageable);
   }
 
   @Test
