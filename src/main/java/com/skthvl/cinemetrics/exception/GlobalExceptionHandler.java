@@ -2,6 +2,7 @@ package com.skthvl.cinemetrics.exception;
 
 import com.skthvl.cinemetrics.model.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
    *     (BAD_REQUEST)
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, String>> handleValidationException(
+  public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(
       MethodArgumentNotValidException ex) {
     final Map<String, String> errors = new HashMap<>();
 
@@ -53,7 +54,7 @@ public class GlobalExceptionHandler {
             });
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
   }
-
+ 
   /**
    * Handles constraint violation exceptions that occur during validation. Maps violated constraints
    * to their corresponding error messages.
@@ -87,7 +88,8 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({
     MovieNotFoundException.class,
     UserNameAlreadyExistException.class,
-    DuplicateRatingException.class
+    DuplicateRatingException.class,
+    ValidationException.class
   })
   public ResponseEntity<ErrorResponse> handleBadRequest(final Exception ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));

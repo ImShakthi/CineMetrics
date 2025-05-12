@@ -61,7 +61,8 @@ public class SecurityConfig {
         "/api/v1/movies/{movieId}/ratings", "/api/v1/ratings/top/**", "/api/v1/auth/logout"
       };
 
-  private static final String[] ADMIN_AUTH_APP_APIs = new String[] {"/api/v1/users"};
+  private static final String[] ADMIN_AUTH_APP_APIs =
+      new String[] {"/api/v1/users", "/api/v1/auth/logout"};
 
   private final JwtAuthenticationFilter jwtFilter;
 
@@ -97,11 +98,11 @@ public class SecurityConfig {
 
                     // admin apis (with JWT)
                     .requestMatchers(ADMIN_AUTH_APP_APIs)
-                    .authenticated()
+                    .hasRole("ADMIN")
 
                     // Other APIs
                     .anyRequest()
-                    .authenticated())
+                    .denyAll())
 
         // Stateless session (required for JWT)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
